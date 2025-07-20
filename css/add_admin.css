@@ -1,0 +1,75 @@
+body {
+  font-family: 'sans-serif';
+  background-color: #fffde7;
+  text-align: center;
+  padding-top: 50px;
+}
+h1 {
+  font-size: 40px;
+  margin-bottom: 40px;
+  color: #b38b00;
+}
+form {
+  display: inline-block;
+  background: #fff;
+  padding: 40px 50px 30px 50px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.08);
+  text-align: left;
+}
+label {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 10px;
+  color: #b38b00;
+}
+input, select {
+  width: 100%;
+  padding: 10px;
+  font-size: 20px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  border: 1px solid #ffe082;
+  background: #fffde7;
+}
+.btn-submit {
+  width: 100%;
+  padding: 12px;
+  font-size: 22px;
+  border-radius: 12px;
+  border: none;
+  background: #ffe27a;
+  color: #b38b00;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-submit:hover {
+  background: #ffd94a;
+}
+.btn-back {
+  margin-top: 20px;
+  padding: 8px 30px;
+  font-size: 18px;
+  border-radius: 20px;
+  border: none;
+  background: #ffe27a;
+  color: #b38b00;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-back:hover {
+  background: #ffd94a;
+}
+.success {
+  color: green;
+  font-size: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.error {
+  color: red;
+  font-size: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+} 
