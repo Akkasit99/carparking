@@ -49,6 +49,7 @@ if (is_array($data) && count($data) > 0) {
         <?php endif; ?>
         <div>
             <button class="btn-back" onclick="window.location.href='dashboard.php'">ย้อนกลับ</button>
+            <button class="btn-back" onclick="window.location.href='add_camera.php'" style="margin-left:10px;">เพิ่มกล้อง</button>
         </div>
         
     </div>
