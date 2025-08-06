@@ -1,4 +1,4 @@
-body { font-family: 'sans-serif'; background: linear-gradient(135deg, #97c3e3 0%, #b3e5fc 100%); text-align: center; padding-top: 60px; }
+body { font-family: 'sans-serif'; background: #ffffff; text-align: center; padding-top: 60px; }
 .profile-box { background: #92f4f4; display: inline-block; padding: 40px 60px; border-radius: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.08); }
 h1 { color: #1976d2; }
 .info { font-size: 22px; margin: 20px 0; }
