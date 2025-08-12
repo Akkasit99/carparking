@@ -1,145 +1,75 @@
-# Car Parking Management System
+# ระบบจัดการลานจอดรถ
 
-ระบบจัดการลานจอดรถที่พัฒนาด้วย PHP และ Supabase
+## การตั้งค่า Supabase Storage
 
-## Features
+### 1. สร้าง Storage Bucket
+1. เข้าไปที่ Supabase Dashboard
+2. ไปที่ Storage > Buckets
+3. สร้าง bucket ใหม่ชื่อ `vehicle-images`
+4. ตั้งค่าเป็น Public bucket
 
-- 🔐 ระบบล็อกอินผู้ดูแลระบบ
-- 📸 บันทึกภาพรถทางเข้า-ออก
-- 📊 แสดงข้อมูลรถในลานจอด
-- 👥 จัดการผู้ดูแลระบบ
-- 📱 Responsive Design
+### 2. ตั้งค่า Storage Policies
+สร้าง policy สำหรับให้อ่านรูปภาพได้:
 
-## Technologies Used
+```sql
+-- Policy สำหรับอ่านรูปภาพ (public access)
+CREATE POLICY "Public Access" ON storage.objects FOR SELECT USING (bucket_id = 'vehicle-images');
 
-- **Backend**: PHP
-- **Database**: Supabase (PostgreSQL)
-- **Frontend**: HTML, CSS, JavaScript
-- **Server**: XAMPP
-
-## Installation
-
-1. **Clone Repository**
-   ```bash
-   git clone https://github.com/Akkasit99/carparking.git
-   cd carparking
-   ```
-
-2. **Setup XAMPP**
-   - Install XAMPP
-   - Copy project to `htdocs/` folder
-   - Start Apache server
-
-3. **Database Configuration**
-   - Create `db_connect.php` file with your Supabase credentials:
-   ```php
-   <?php
-   $supabase_url = "https://dgqqonbhhivprdoutkzp.supabase.co";
-   $supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRncXFvbmJoaGl2cHJkb3V0a3pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1NDE4NjMsImV4cCI6MjA2NzExNzg2M30.Hm1k9yUAFJ1uRXF7K2h8n7DVtKicSaL_ox2bQPgJPQI";
-   ?>
-   ```
-
-4. **Access Application**
-   - Open browser: `http://localhost/carparking`
-
-## Project Structure
-
-```
-carparking/
-├── css/                    # CSS files for each page
-│   ├── index.css
-│   ├── dashboard.css
-│   ├── add_admin.css
-│   ├── entrance.css
-│   ├── exit.css
-│   ├── parking_lot.css
-│   └── profile.css
-├── image/                  # Car images
-├── index.php              # Login page
-├── dashboard.php          # Main dashboard
-├── login.php              # Authentication
-├── add_admin.php          # Add admin users
-├── entrance.php           # Entrance records
-├── exit.php               # Exit records
-├── parking_lot.php        # Parking lot status
-├── profile.php            # User profile
-├── logout.php             # Logout
-└── db_connect.php         # Database connection (not in repo)
+-- Policy สำหรับอัปโหลดรูปภาพ (authenticated users only)
+CREATE POLICY "Authenticated users can upload" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'vehicle-images' AND auth.role() = 'authenticated');
 ```
 
-## Database Schema
+### 3. โครงสร้าง Database
+ตาราง `entrance`:
+- `id` (int, primary key)
+- `image` (text) - ชื่อไฟล์รูปภาพ
+- `date` (timestamp)
+- `camera_id` (text)
 
-### Tables
-- **users**: Admin user accounts
-- **entrance**: Car entrance records
-- **parking_exit**: Car exit records
-- **parking_lot**: Current parking status
+ตาราง `parking_exit`:
+- `id` (int, primary key)
+- `image` (text) - ชื่อไฟล์รูปภาพ
+- `date` (timestamp)
+- `camera_id` (text)
 
-## Security Features
+ตาราง `parking_lot`:
+- `id` (int, primary key)
+- `image` (text) - ชื่อไฟล์รูปภาพ
+- `date` (timestamp)
+- `camera_id` (text)
 
-- Session-based authentication
-- SQL injection protection
-- XSS prevention
-- Input validation
+## การใช้งาน
 
-## Contributing
+### การอัปโหลดรูปภาพ
+1. อัปโหลดรูปภาพไปยัง Supabase Storage bucket `vehicle-images`
+2. บันทึกชื่อไฟล์ลงในฐานข้อมูล
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### การแสดงรูปภาพ
+ระบบรองรับการแสดงรูปภาพ 2 แบบ:
 
-## License
+1. **URL จากภายนอก** (เช่น จากกล้องหรือระบบอื่น):
+   - ระบบจะตรวจสอบว่าเป็น URL ที่ถูกต้อง
+   - แสดงรูปภาพจาก URL นั้นโดยตรง
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+2. **ไฟล์ใน Supabase Storage**:
+   - ระบบจะสร้าง URL จาก Supabase Storage
+   - URL format: `https://[YOUR_SUPABASE_URL]/storage/v1/object/public/vehicle-images/[FILENAME]`
 
-## Support
+## การแก้ไขปัญหา
 
-For support, email support@example.com or create an issue in this repository. 
+### รูปภาพไม่แสดง
+1. ตรวจสอบว่า bucket `vehicle-images` ถูกสร้างแล้ว
+2. ตรวจสอบ storage policies ว่าอนุญาตให้อ่านได้
+3. ตรวจสอบว่าชื่อไฟล์ในฐานข้อมูลตรงกับไฟล์ใน storage
 
-## ขั้นตอนการติดตั้ง Git และ Push ขึ้น GitHub:
-
-### 1. ติดตั้ง Git
-- ดาวน์โหลด Git จาก: https://git-scm.com/download/win
-- ติดตั้งตามขั้นตอนปกติ
-
-### 2. ตั้งค่า Git (หลังจากติดตั้งแล้ว)
-```bash
-git config --global user.name "Akkasit99"
-git config --global user.email "akkasit270@gmail.com"
+### การตั้งค่า CORS (ถ้าจำเป็น)
+หากมีปัญหา CORS ให้เพิ่ม policy:
+```sql
+CREATE POLICY "CORS Policy" ON storage.objects FOR SELECT USING (bucket_id = 'vehicle-images');
 ```
 
-### 3. สร้าง Repository บน GitHub
-- ไปที่ https://github.com
-- คลิก "New repository"
-- ตั้งชื่อ repository (เช่น "carparking")
-- เลือก Public หรือ Private
-- **อย่า** เลือก "Initialize this repository with a README"
-
-### 4. Push โปรเจกต์ขึ้น GitHub
-หลังจากติดตั้ง Git แล้ว ให้รันคำสั่งเหล่านี้:
-
-```bash
-<code_block_to_apply_changes_from>
-```
-
-### 5. ไฟล์ที่เตรียมไว้แล้ว:
-- ✅ `.gitignore` - ไม่รวมไฟล์ที่สำคัญ (db_connect.php)
-- ✅ `README.md` - คำอธิบายโปรเจกต์
-
-### หมายเหตุสำคัญ:
-- **ไฟล์ `db_connect.php` จะไม่ถูก push ขึ้น GitHub** (เพื่อความปลอดภัย)
-- ผู้ใช้ที่ clone โปรเจกต์ต้องสร้างไฟล์ `db_connect.php` เอง
-- ข้อมูล Supabase URL และ Key จะไม่ถูกเปิดเผย
-
-ต้องการให้ช่วยติดตั้ง Git หรือมีคำถามเพิ่มเติมไหมครับ?
-
-# ตรวจสอบว่า Git ติดตั้งแล้ว
-git --version
-
-# เพิ่ม remote repository
-git remote add origin https://github.com/Akkasit99/carparking.git
-
-# Push ขึ้น GitHub
-git push -u origin main 
+## ไฟล์ที่เกี่ยวข้อง
+- `entrance.php` - แสดงข้อมูลรถทางเข้า
+- `exit.php` - แสดงข้อมูลรถทางออก  
+- `parking_lot.php` - แสดงข้อมูลรถในลานจอด
+- `db_connect.php` - การเชื่อมต่อฐานข้อมูล 

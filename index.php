@@ -21,7 +21,7 @@ if (isset($_SESSION['user'])) {
   <form action="login.php" method="post">
     <div>
         <label for="username">ผู้ดูแลระบบ</label>
-        <input type="text" id="username" name="username" placeholder="Admin@mail.com">
+        <input type="text" id="username" name="username" placeholder="Admin">
     </div>
     <div>
        <label for="password">รหัสผ่าน</label>

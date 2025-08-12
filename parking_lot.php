@@ -6,23 +6,9 @@ if (!isset($_SESSION['user'])) {
 }
 require_once 'db_connect.php';
 
-// รับค่าการกรองวันที่และเวลา
-$filter_date = isset($_GET['filter_date']) ? $_GET['filter_date'] : '';
-$filter_time = isset($_GET['filter_time']) ? $_GET['filter_time'] : '';
-
-// สร้างเงื่อนไขการกรอง
-$filter_conditions = [];
-if ($filter_date) {
-    if ($filter_time) {
-        // กรองตามวันที่และเวลาที่แน่นอน
-        $datetime = $filter_date . 'T' . $filter_time;
-        $filter_conditions[] = "date.eq.$datetime";
-    } else {
-        // กรองตามวันที่เท่านั้น
-        $filter_conditions[] = "date.gte.$filter_date";
-        $filter_conditions[] = "date.lt.$filter_date" . "T23:59:59";
-    }
-}
+// รับค่าวันที่จากฟอร์ม
+$selected_date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
+$selected_time = isset($_GET['time']) ? $_GET['time'] : '00:00';
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -30,102 +16,53 @@ if ($filter_date) {
   <meta charset="UTF-8">
   <title>ข้อมูลรถที่เข้าลานจอด</title>
   <link rel="stylesheet" href="css/parking_lot.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
-    .calendar-btn {
-      position: absolute;
-      top: 32px;
-      right: 32px;
-      background: #fff;
+    .filter-section {
+      background: #f5f5f5;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .filter-section input, .filter-section button {
+      margin: 5px;
+      padding: 8px 12px;
       border: 1px solid #ddd;
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-      cursor: pointer;
-      font-size: 22px;
-      transition: background 0.2s;
-      z-index: 10;
-    }
-    .calendar-btn:hover {
-      background: #f0f0f0;
-    }
-    .calendar-modal-bg {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.25);
-      display: none;
-      z-index: 1000;
-    }
-    .calendar-modal {
-      background: #fff;
-      border-radius: 10px;
-      max-width: 350px;
-      margin: 120px auto;
-      padding: 28px 24px 18px 24px;
-      position: relative;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.13);
-    }
-    .calendar-modal .close {
-      position: absolute;
-      top: 10px;
-      right: 18px;
-      font-size: 24px;
-      color: #888;
-      cursor: pointer;
-    }
-    .calendar-modal label {
-      font-weight: bold;
-      margin-bottom: 4px;
-      display: block;
-    }
-    .calendar-modal input {
-      width: 100%;
-      margin-bottom: 14px;
-      padding: 7px 8px;
-      border: 1px solid #ccc;
       border-radius: 4px;
-      font-size: 15px;
     }
-    .calendar-modal .btn-filter {
-      width: 100%;
+    .filter-section button {
       background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 10px 0;
-      font-size: 16px;
+      color: white;
       cursor: pointer;
-      margin-top: 8px;
     }
-    .calendar-modal .btn-filter:hover {
+    .filter-section button:hover {
       background: #0056b3;
+    }
+    .filter-section button[type="reset"] {
+      background: #6c757d;
+    }
+    .filter-section button[type="reset"]:hover {
+      background: #545b62;
     }
   </style>
 </head>
 <body>
   <h1>ข้อมูลรถที่เข้าลานจอด</h1>
-  <div style="position:relative; min-height:40px;">
-    <button class="calendar-btn" title="เลือกวันที่/เวลา" onclick="openCalendarModal()">
-      <i class="fa fa-calendar"></i>
-    </button>
+  
+  <!-- ฟิลเตอร์วันที่/เวลา -->
+  <div class="filter-section">
+    <form method="GET" action="">
+      <label for="date">เลือกวันที่:</label>
+      <input type="date" id="date" name="date" value="<?php echo htmlspecialchars($selected_date); ?>">
+      
+      <label for="time">เลือกเวลา:</label>
+      <input type="time" id="time" name="time" value="<?php echo htmlspecialchars($selected_time); ?>">
+      
+      <button type="submit">ค้นหา</button>
+      <button type="reset" onclick="resetFilter()">ล้างฟิลเตอร์</button>
+    </form>
   </div>
-  <!-- Modal สำหรับเลือกวันที่/เวลา -->
-  <div id="calendarModalBg" class="calendar-modal-bg">
-    <div class="calendar-modal">
-      <span class="close" onclick="closeCalendarModal()">&times;</span>
-      <form id="calendarForm" method="GET" action="">
-        <label for="filter_date">วันที่:</label>
-        <input type="date" id="filter_date" name="filter_date">
-        <label for="filter_time">เวลา:</label>
-        <input type="time" id="filter_time" name="filter_time">
-        <button type="submit" class="btn-filter"><i class="fa fa-filter"></i> กรองข้อมูล</button>
-      </form>
-    </div>
-  </div>
+
   <table>
     <tr>
       <th>ID</th>
@@ -134,14 +71,17 @@ if ($filter_date) {
       <th>กล้อง</th>
     </tr>
     <?php
-    // สร้าง URL สำหรับ API
-    $url = $supabase_url . "/rest/v1/parking_lot?select=id,image,date,camera_id&order=date.desc";
+    // สร้าง URL สำหรับ Supabase query พร้อมฟิลเตอร์วันที่
+    $start_datetime = $selected_date . 'T' . $selected_time . ':00';
+    $end_datetime = $selected_date . 'T23:59:59';
     
-    // เพิ่มเงื่อนไขการกรอง
-    if (!empty($filter_conditions)) {
-        $url .= "&" . implode("&", $filter_conditions);
+    // ถ้าเป็นวันที่ปัจจุบันและเวลา 00:00 (ค่าเริ่มต้น) ให้แสดงรูปภาพทั้งหมด
+    if ($selected_date == date('Y-m-d') && $selected_time == '00:00') {
+      $url = $supabase_url . "/rest/v1/parking_lot?select=id,image,date,camera_id&order=date.desc";
+    } else {
+      $url = $supabase_url . "/rest/v1/parking_lot?select=id,image,date,camera_id&date=gte." . urlencode($start_datetime) . "&date=lte." . urlencode($end_datetime) . "&order=date.desc";
     }
-
+    
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -153,30 +93,44 @@ if ($filter_date) {
     curl_close($ch);
     $result = json_decode($response, true);
     
-    // แสดงข้อมูลการกรอง
-    if ($filter_date || $filter_time) {
-        echo '<div style="margin-bottom: 15px; color: #666; font-style: italic;">';
-        echo 'แสดงผลข้อมูลที่กรองแล้ว';
-        if ($filter_date) echo " วันที่: $filter_date";
-        if ($filter_time) echo " เวลา: $filter_time";
-        echo '</div>';
-    }
+    // สร้าง array สำหรับเก็บข้อมูลรูปภาพสำหรับ JavaScript
+    $imagesData = [];
     
     if (is_array($result) && count($result) > 0) {
       foreach($result as $row) {
-        $imgFile = htmlspecialchars($row['image']);
+        $imgUrl = $row['image'];
+        // ตรวจสอบว่าเป็น URL เต็มหรือไม่ ถ้าไม่ใช่ให้สร้าง URL เต็ม
+        if (!filter_var($imgUrl, FILTER_VALIDATE_URL)) {
+          $imgUrl = "https://dgqqonbhhivprdoutkzp.supabase.co/storage/v1/object/public/image/" . $imgUrl;
+        }
+        
+        // เก็บข้อมูลรูปภาพสำหรับ JavaScript
+        $imagesData[] = [
+          'id' => $row['id'],
+          'url' => $imgUrl,
+          'date' => $row['date'],
+          'camera' => $row['camera_id']
+        ];
+        
         echo '<tr>';
         echo '<td>' . $row['id'] . '</td>';
         echo '<td style="text-align:center;">';
-        echo '<img src="image/' . $imgFile . '" width="80"><br>';
-        echo '<button class="expand-btn" onclick="openModal(\'image/' . $imgFile . '\')">ขยายรูป</button>';
+        echo '<img src="' . htmlspecialchars($imgUrl) . '" width="80" style="max-height: 80px; object-fit: cover;"><br>';
+        echo '<button class="expand-btn" onclick="openModal(\'' . htmlspecialchars($imgUrl) . '\')">ขยายรูป</button>';
         echo '</td>';
         echo '<td>' . $row['date'] . '</td>';
         echo '<td>' . $row['camera_id'] . '</td>';
         echo '</tr>';
       }
+      
+      // แสดงข้อความสรุป
+      if ($selected_date == date('Y-m-d') && $selected_time == '00:00') {
+        echo '<tr><td colspan="4" style="text-align: center; font-weight: bold; color: #28a745;">แสดงรูปภาพทั้งหมดในฐานข้อมูล ' . count($result) . ' รายการ</td></tr>';
+      } else {
+        echo '<tr><td colspan="4" style="text-align: center; font-weight: bold; color: #007bff;">พบข้อมูลในวันที่เลือก ' . count($result) . ' รายการ</td></tr>';
+      }
     } else {
-      echo '<tr><td colspan="4">ไม่มีข้อมูล</td></tr>';
+      echo '<tr><td colspan="4" style="text-align: center; color: #dc3545;">ไม่พบข้อมูล</td></tr>';
     }
     ?>
   </table>
@@ -187,29 +141,29 @@ if ($filter_date) {
     <img class="modal-content" id="modalImg">
   </div>
   <button class="btn-back" onclick="window.location.href='dashboard.php'">ย้อนกลับ</button>
+  
   <script>
+    // ข้อมูลรูปภาพจาก PHP
+    const imagesData = <?php echo json_encode($imagesData); ?>;
+    
     function openModal(imgSrc) {
       var modal = document.getElementById('imgModal');
       var modalImg = document.getElementById('modalImg');
       modal.style.display = 'block';
       modalImg.src = imgSrc;
     }
+    
     function closeModal() {
       document.getElementById('imgModal').style.display = 'none';
     }
-    // Calendar modal logic
-    function openCalendarModal() {
-      document.getElementById('calendarModalBg').style.display = 'block';
+    
+    function resetFilter() {
+      window.location.href = window.location.pathname;
     }
-    function closeCalendarModal() {
-      document.getElementById('calendarModalBg').style.display = 'none';
-    }
-    // ปิด modal เมื่อกด ESC หรือคลิกพื้นหลัง
+    
+    // ปิด modal เมื่อกด ESC
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeCalendarModal();
-    });
-    document.getElementById('calendarModalBg').addEventListener('click', function(e) {
-      if (e.target === this) closeCalendarModal();
+      if (e.key === 'Escape') closeModal();
     });
   </script>
 </body>
