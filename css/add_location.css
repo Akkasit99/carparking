@@ -1,132 +1,115 @@
 body {
     font-family: 'sans-serif';
-    background-color: #eeeeee;
-    margin: 0;
-    padding: 20px;
-}
-
-.container {
-    max-width: 600px;
-    margin: 0 auto;
-    background-color: white;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
+    background-color: #fffde7;
     text-align: center;
-    color: #333;
+    padding-top: 50px;
+  }
+  h1, h2 {
+    color: #b38b00;
+  }
+  h1 { font-size: 40px; margin-bottom: 40px; }
+  h2 { margin-top: 30px; }
+  form {
+    display: inline-block;
+    background: #fff;
+    padding: 40px 50px 30px 50px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    text-align: left;
     margin-bottom: 30px;
-    font-size: 32px;
-}
-
-.success-message {
-    background-color: #e8f5e8;
-    color: #2e7d32;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    border: 1px solid #c8e6c9;
-    text-align: center;
-    font-weight: bold;
-}
-
-.error-message {
-    background-color: #ffebee;
-    color: #c62828;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    border: 1px solid #ffcdd2;
-}
-
-.form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-label {
-    font-weight: bold;
-    color: #333;
-    font-size: 16px;
-}
-
-input[type="text"], select {
+  }
+  label {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 10px;
+    color: #b38b00;
+  }
+  input, select {
+    width: 100%;
+    padding: 10px;
+    font-size: 20px;
+    margin-bottom: 25px;
+    border-radius: 10px;
+    border: 1px solid #ffe082;
+    background: #fffde7;
+  }
+  .btn-submit, .btn-delete, .btn-back {
+    width: 100%;
     padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: border-color 0.3s;
-}
-
-input[type="text"]:focus, select:focus {
-    outline: none;
-    border-color: #4CAF50;
-}
-
-input[type="text"]::placeholder {
-    color: #999;
-}
-
-select {
-    background-color: white;
-    cursor: pointer;
-}
-
-.button-group {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.btn-submit, .btn-cancel {
-    padding: 12px 30px;
+    font-size: 22px;
+    border-radius: 12px;
     border: none;
-    border-radius: 5px;
-    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.btn-submit {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.btn-submit:hover {
-    background-color: #45a049;
-}
-
-.btn-cancel {
-    background-color: #f44336;
-    color: white;
-}
-
-.btn-cancel:hover {
-    background-color: #da190b;
-}
-
-@media (max-width: 768px) {
-    .container {
-        margin: 10px;
-        padding: 20px;
-    }
-    
-    .button-group {
-        flex-direction: column;
-    }
-    
-    .btn-submit, .btn-cancel {
-        width: 100%;
-    }
-}
+    transition: background 0.2s;
+    margin-top: 10px;
+  }
+  .btn-submit {
+    background: #ffe27a;
+    color: #b38b00;
+  }
+  .btn-submit:hover { background: #ffd94a; }
+  .btn-delete {
+    background: #ffe27a;
+    color: #b38b00;
+  }
+  .btn-delete:hover { background: #ffd94a; }
+  .btn-back {
+    width: auto;
+    padding: 8px 30px;
+    font-size: 18px;
+    border-radius: 20px;
+    background: #ffe27a;
+    color: #b38b00;
+  }
+  .btn-back:hover { background: #ffd94a; }
+  .success { color: green; text-align: center; font-weight: bold; margin-top: 10px; }
+  .error { color: red; text-align: center; font-weight: bold; margin-top: 10px; }
+  
+  .success {
+    color: green;
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .error {
+    color: red;
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  /* แท็บปุ่ม */
+  .tab-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+  
+  .tab-btn {
+    padding: 12px 25px;
+    font-size: 18px;
+    border: 2px solid #ffe27a;
+    border-radius: 25px;
+    background: white;
+    color: #b38b00;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+  }
+  
+  .tab-btn:hover {
+    background: #ffe27a;
+    color: #b38b00;
+  }
+  
+  .tab-btn.active {
+    background: #ffe27a;
+    color: #b38b00;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .tab-content {
+    margin-bottom: 20px;
+  } 
