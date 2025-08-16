@@ -39,6 +39,25 @@ h1 {
 .btn-red:hover {
   background-color: rgb(218, 17, 17);
 }
+.btn-location {
+  position: fixed;
+  top: 90px;
+  right: 40px;
+  width: auto;
+  padding: 15px 25px;
+  font-size: 18px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 25px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  display: block;
+}
+.btn-location:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
 .profile-btn {
   position: absolute;
   top: 30px;

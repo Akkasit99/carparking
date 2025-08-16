@@ -28,6 +28,7 @@ if (!isset($_SESSION['user'])) {
   <button class="btn btn-yellow" onclick="window.location.href='add_admin.php'">เพิ่มผู้ดูแลระบบ</button>
   <button class="btn btn-red" onclick="window.location.href='dashboard.php?logout=1'">ออกจากระบบ</button>
   <button class="btn profile-btn" onclick="window.location.href='profile.php'">ข้อมูลผู้ดูแลระบบ</button>
+  
 
 </body>
 </html>

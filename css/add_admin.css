@@ -87,4 +87,39 @@ input, select {
   font-size: 20px;
   margin-bottom: 20px;
   text-align: center;
+}
+
+/* แท็บปุ่ม */
+.tab-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.tab-btn {
+  padding: 12px 25px;
+  font-size: 18px;
+  border: 2px solid #ffe27a;
+  border-radius: 25px;
+  background: white;
+  color: #b38b00;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.tab-btn:hover {
+  background: #ffe27a;
+  color: #b38b00;
+}
+
+.tab-btn.active {
+  background: #ffe27a;
+  color: #b38b00;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.tab-content {
+  margin-bottom: 20px;
 } 
