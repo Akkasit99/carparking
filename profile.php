@@ -49,8 +49,8 @@ if (is_array($data) && count($data) > 0) {
         <?php endif; ?>
         <div>
             <button class="btn-back" onclick="window.location.href='dashboard.php'" style="background-color: #ff7043; color: white;">ย้อนกลับ</button>
-            <button class="btn-back" onclick="window.location.href='add_camera.php'" style="margin-left:10px;">เพิ่มกล้อง</button>
-            <button class="btn-back" onclick="window.location.href='add_location.php'" style="margin-left:10px;">เพิ่มสถานที่</button>
+            <button class="btn-back" onclick="window.location.href='add_camera.php'" style="margin-left:10px;">จัดการกล้อง</button>
+            <button class="btn-back" onclick="window.location.href='add_location.php'" style="margin-left:10px;">จัดการสถานที่</button>
         </div>
         
     </div>
