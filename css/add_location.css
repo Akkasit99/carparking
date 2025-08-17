@@ -113,3 +113,47 @@ body {
   .tab-content {
     margin-bottom: 20px;
   } 
+  /* ===== เพิ่มเติม: จัดเลย์เอาต์ให้ปุ่มไปอยู่ด้านใต้ ===== */
+
+/* ใช้กับฟอร์มที่ต้องการให้วางเป็นบล็อก (ทับ inline-block เดิม) */
+.as-block {
+  display: block !important;
+  margin: 0 auto 24px;
+  max-width: 560px; /* ปรับตามต้องการ */
+}
+
+/* แถวปุ่มด้านล่างฟอร์ม */
+.bottom-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 10px auto 0;
+}
+
+/* ปุ่มสลับการแสดงฟอร์มลบ ให้หน้าตาเหมือน .btn-back */
+.btn-toggle-delete {
+  padding: 8px 30px;
+  font-size: 18px;
+  border-radius: 20px;
+  background: #ffe27a;
+  color: #b38b00;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-toggle-delete:hover { background: #ffd94a; }
+
+/* ส่วนฟอร์มลบ (ซ่อนไว้ก่อน) */
+#deleteSection {
+  display: none;
+  margin-top: 20px;
+}
+
+/* (ไม่บังคับ) ปักปุ่มไว้ล่างหน้าจอเสมอ */
+.footer-fixed {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: transparent;   /* ใช้พื้นหลังเดิมของหน้า */
+  padding: 12px 0;
+}

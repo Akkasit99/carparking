@@ -4,20 +4,11 @@ body {
   text-align: center;
   padding-top: 50px;
 }
-
 h1, h2 {
   color: #b38b00;
 }
-
-h1 { 
-  font-size: 40px; 
-  margin-bottom: 40px; 
-}
-
-h2 { 
-  margin-top: 30px; 
-}
-
+h1 { font-size: 40px; margin-bottom: 40px; }
+h2 { margin-top: 30px; }
 form {
   display: inline-block;
   background: #fff;
@@ -27,14 +18,12 @@ form {
   text-align: left;
   margin-bottom: 30px;
 }
-
 label {
   font-size: 22px;
   display: block;
   margin-bottom: 10px;
   color: #b38b00;
 }
-
 input, select {
   width: 100%;
   padding: 10px;
@@ -44,7 +33,6 @@ input, select {
   border: 1px solid #ffe082;
   background: #fffde7;
 }
-
 .btn-submit, .btn-delete, .btn-back {
   width: 100%;
   padding: 12px;
@@ -56,25 +44,16 @@ input, select {
   transition: background 0.2s;
   margin-top: 10px;
 }
-
 .btn-submit {
   background: #ffe27a;
   color: #b38b00;
 }
-
-.btn-submit:hover { 
-  background: #ffd94a; 
-}
-
+.btn-submit:hover { background: #ffd94a; }
 .btn-delete {
   background: #ffe27a;
   color: #b38b00;
 }
-
-.btn-delete:hover { 
-  background: #ffd94a; 
-}
-
+.btn-delete:hover { background: #ffd94a; }
 .btn-back {
   width: auto;
   padding: 8px 30px;
@@ -83,41 +62,9 @@ input, select {
   background: #ffe27a;
   color: #b38b00;
 }
-
-.btn-back:hover { 
-  background: #ffd94a; 
-}
-
-.success { 
-  color: green; 
-  text-align: center; 
-  font-weight: bold; 
-  margin-top: 10px; 
-}
-
-.error { 
-  color: red; 
-  text-align: center; 
-  font-weight: bold; 
-  margin-top: 10px; 
-}
-.btn-delete {
-  width: 100%;
-  padding: 12px;
-  font-size: 22px;
-  border-radius: 12px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 10px;
-  background: #ffe27a;
-  color: #b38b00;
-}
-
-.btn-delete:hover { 
-  background: #ffd94a; 
-}
+.btn-back:hover { background: #ffd94a; }
+.success { color: green; text-align: center; font-weight: bold; margin-top: 10px; }
+.error { color: red; text-align: center; font-weight: bold; margin-top: 10px; }
 
 .success {
   color: green;
@@ -166,3 +113,32 @@ input, select {
 .tab-content {
   margin-bottom: 20px;
 } 
+.form-card {
+  display: inline-block;
+  background: #fff;
+  padding: 40px 50px 30px 50px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.08);
+  text-align: left;
+  margin: 0 auto 30px;
+  max-width: 560px;   /* ความกว้างสูงสุด */
+  width: 100%;
+  min-height: 280px;  /* ✅ บังคับให้สูงอย่างน้อยเท่ากับฟอร์มเพิ่ม */
+  box-sizing: border-box;
+}
+/* ปุ่มล่างอยู่กึ่งกลางและห่างกันสวย ๆ */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+/* ซ่อนฟอร์มลบเริ่มต้น */
+#deleteForm { display:none; margin-top:20px; }
+/* ปุ่มในฟอร์มให้เต็มความกว้าง */
+.form-card .btn-submit,
+.form-card .btn-delete { width:100%; }
+/* ช่องอินพุต/เลือกให้เต็มฟอร์ม */
+.form-card input[type="text"],
+.form-card select { width:100%; }

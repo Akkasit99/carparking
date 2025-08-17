@@ -51,7 +51,7 @@ list($httpCam, $respCam) = call_supabase(
 );
 $cameras = $httpCam === 200 ? json_decode($respCam, true) : [];
 
-// โหลดข้อมูลสถานที่ (ใช้คอลัมน์ id, location_name, camera_id)
+// โหลดข้อมูลสถานที่
 list($httpLoc, $respLoc) = call_supabase(
     'GET',
     $supabase_url . "/rest/v1/locations?select=id,location_name,camera_id",
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_location'])) {
     }
 }
 
-// ลบสถานที่ (ลบด้วยคีย์หลัก id)
+// ลบสถานที่
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location'])) {
     $location_id = trim($_POST['location_id'] ?? '');
     if ($location_id !== '') {
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location'])) {
 <head>
     <meta charset="UTF-8">
     <title>จัดการสถานที่</title>
-    <link rel="stylesheet" href="css/add_location.css">
+    <<link rel="stylesheet" href="css/add_admin.css">
 </head>
 <body>
     <h1>จัดการสถานที่</h1>
@@ -131,28 +131,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location'])) {
         <button type="submit" class="btn-submit">บันทึก</button>
     </form>
 
-    <!-- ฟอร์มลบสถานที่ -->
-    <h2>ลบสถานที่</h2>
-    <form method="post" onsubmit="return confirm('ยืนยันการลบสถานที่นี้?');">
-        <input type="hidden" name="delete_location" value="1">
+    <!-- ฟอร์มลบสถานที่ (ซ่อนเริ่มต้น) -->
+    <div id="deleteForm">
+        <h2>ลบสถานที่</h2>
+        <form method="post" onsubmit="return confirm('ยืนยันการลบสถานที่นี้?');">
+            <input type="hidden" name="delete_location" value="1">
 
-        <label for="location_id">เลือกสถานที่ (ชื่อสถานที่ - กล้อง):</label>
-        <select id="location_id" name="location_id" required>
-            <option value="">เลือกสถานที่</option>
-            <?php foreach ($locations as $loc): ?>
-                <?php
-                    $id   = htmlspecialchars($loc['id'] ?? '', ENT_QUOTES, 'UTF-8');
-                    $name = htmlspecialchars($loc['location_name'] ?? '', ENT_QUOTES, 'UTF-8');
-                    $cam  = htmlspecialchars($loc['camera_id'] ?? '', ENT_QUOTES, 'UTF-8');
-                ?>
-                <option value="<?php echo $id; ?>"><?php echo "{$name} ({$cam})"; ?></option>
-            <?php endforeach; ?>
-        </select>
+            <label for="location_id">เลือกสถานที่ (ชื่อสถานที่ - กล้อง):</label>
+            <select id="location_id" name="location_id" required>
+                <option value="">เลือกสถานที่</option>
+                <?php foreach ($locations as $loc): ?>
+                    <?php
+                        $id   = htmlspecialchars($loc['id'] ?? '', ENT_QUOTES, 'UTF-8');
+                        $name = htmlspecialchars($loc['location_name'] ?? '', ENT_QUOTES, 'UTF-8');
+                        $cam  = htmlspecialchars($loc['camera_id'] ?? '', ENT_QUOTES, 'UTF-8');
+                    ?>
+                    <option value="<?php echo $id; ?>"><?php echo "{$name} ({$cam})"; ?></option>
+                <?php endforeach; ?>
+            </select>
 
-        <button type="submit" class="btn-delete">ลบ</button>
-    </form>
+            <button type="submit" class="btn-delete">ลบ</button>
+        </form>
+    </div>
 
-    <br>
-    <button class="btn-back" onclick="window.location.href='profile.php'">ย้อนกลับ</button>
+    <!-- ปุ่มด้านล่าง -->
+    <div class="button-container">
+        <button class="btn-back" onclick="window.location.href='profile.php'">ย้อนกลับ</button>
+        <button class="btn-back" type="button" onclick="toggleDeleteForm()">ลบข้อมูลสถานที่</button>
+    </div>
+
+    <script>
+      // ซ่อนส่วนลบทันทีทุกครั้งที่เข้าหน้า (โหลดใหม่)
+      document.addEventListener('DOMContentLoaded', function () {
+          const form = document.getElementById('deleteForm');
+          const btn  = document.getElementById('toggleDeleteBtn');
+          if (form) form.style.display = 'none';  // force hide on load
+          if (btn)  btn.textContent = 'ลบสถานที่'; // รีเซ็ตข้อความปุ่ม
+      });
+
+      function toggleDeleteForm() {
+          const form = document.getElementById('deleteForm');
+          const btn  = document.getElementById('toggleDeleteBtn');
+          const hidden = (form.style.display === 'none' || form.style.display === '');
+          form.style.display = hidden ? 'block' : 'none';
+          btn.textContent = hidden ? 'ยกเลิกการลบ' : 'ลบสถานที่';
+          if (!hidden) return;
+          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    </script>
 </body>
 </html>
