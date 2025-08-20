@@ -97,87 +97,121 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location'])) {
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>จัดการสถานที่</title>
-    <<link rel="stylesheet" href="css/add_admin.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการสถานที่ - Car Parking Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <h1>จัดการสถานที่</h1>
+    <div class="page-wrapper">
+        <!-- Background Shapes -->
+        <div class="page-background">
+        </div>
 
-    <?php if ($success): ?>
-        <div class="success"><?php echo htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?></div>
-    <?php endif; ?>
-    <?php if ($error): ?>
-        <div class="error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
-    <?php endif; ?>
+        <!-- Modern Header -->
+        <header class="modern-header">
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="brand-logo">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="brand-text">
+                            <h1>จัดการสถานที่</h1>
+                            <span>Location Management</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="header-nav">
+                        <a href="dashboard.php" class="nav-btn">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>ย้อนกลับ</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </header>
 
-    <!-- ฟอร์มเพิ่มสถานที่ -->
-    <h2>เพิ่มสถานที่</h2>
-    <form method="post">
-        <input type="hidden" name="add_location" value="1">
+        <!-- Main Content -->
+        <div class="content-container">
+            <div class="container">
+        <?php if ($success): ?>
+            <div id="successMessage" class="success-message" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important; color: white !important; padding: 30px 50px !important; border-radius: 20px !important; font-size: 24px !important; font-weight: 700 !important; text-align: center !important; z-index: 9999 !important; box-shadow: 0 20px 60px rgba(40, 167, 69, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3) !important; border: 3px solid rgba(255, 255, 255, 0.3) !important; min-width: 300px !important; max-width: 500px !important; animation: successPulse 0.8s ease-out !important;">
+                ✓ <?php echo htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+            <script>
+                setTimeout(function() {
+                    const successMsg = document.getElementById('successMessage');
+                    if (successMsg) {
+                        successMsg.style.animation = 'fadeOut 0.5s ease-out forwards';
+                        setTimeout(() => successMsg.remove(), 500);
+                    }
+                }, 3000);
+            </script>
+        <?php endif; ?>
+        <?php if ($error): ?>
+            <div id="errorMessage" class="error-message" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important; color: white !important; padding: 30px 50px !important; border-radius: 20px !important; font-size: 24px !important; font-weight: 700 !important; text-align: center !important; z-index: 9999 !important; box-shadow: 0 20px 60px rgba(220, 53, 69, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3) !important; border: 3px solid rgba(255, 255, 255, 0.3) !important; min-width: 300px !important; max-width: 500px !important; animation: errorShake 0.8s ease-out !important;">
+                ✕ <?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+            <script>
+                setTimeout(function() {
+                    const errorMsg = document.getElementById('errorMessage');
+                    if (errorMsg) {
+                        errorMsg.style.animation = 'fadeOut 0.5s ease-out forwards';
+                        setTimeout(() => errorMsg.remove(), 500);
+                    }
+                }, 4000);
+            </script>
+        <?php endif; ?>
 
-        <label for="location_name">ชื่อสถานที่:</label>
-        <input type="text" id="location_name" name="location_name" placeholder="เช่น โรงพยาบาล" required>
+        <div class="form-container">
+            <h2><i class="fas fa-plus-circle"></i> เพิ่มสถานที่</h2>
+            <form method="post">
+                <input type="hidden" name="add_location" value="1">
+                <div class="form-group">
+                    <label for="location_name">ชื่อสถานที่:</label>
+                    <input type="text" id="location_name" name="location_name" placeholder="เช่น โรงพยาบาล" required>
+                </div>
+                <div class="form-group">
+                    <label for="camera_id">กล้อง:</label>
+                    <select id="camera_id" name="camera_id" required>
+                        <option value="">เลือกกล้อง</option>
+                        <?php foreach ($cameras as $camera): ?>
+                            <option value="<?php echo htmlspecialchars(trim($camera['camera_id'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php echo htmlspecialchars($camera['camera_name'] ?? ($camera['camera_id'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <button type="submit" class="btn-submit">บันทึก</button>
+            </form>
+        </div>
 
-        <label for="camera_id">กล้อง:</label>
-        <select id="camera_id" name="camera_id" required>
-            <option value="">เลือกกล้อง</option>
-            <?php foreach ($cameras as $camera): ?>
-                <option value="<?php echo htmlspecialchars(trim($camera['camera_id'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
-                    <?php echo htmlspecialchars($camera['camera_name'] ?? ($camera['camera_id'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-
-        <button type="submit" class="btn-submit">บันทึก</button>
-    </form>
-
-    <!-- ฟอร์มลบสถานที่ (ซ่อนเริ่มต้น) -->
-    <div id="deleteForm">
-        <h2>ลบสถานที่</h2>
-        <form method="post" onsubmit="return confirm('ยืนยันการลบสถานที่นี้?');">
-            <input type="hidden" name="delete_location" value="1">
-
-            <label for="location_id">เลือกสถานที่ (ชื่อสถานที่ - กล้อง):</label>
-            <select id="location_id" name="location_id" required>
-                <option value="">เลือกสถานที่</option>
-                <?php foreach ($locations as $loc): ?>
-                    <?php
-                        $id   = htmlspecialchars($loc['id'] ?? '', ENT_QUOTES, 'UTF-8');
-                        $name = htmlspecialchars($loc['location_name'] ?? '', ENT_QUOTES, 'UTF-8');
-                        $cam  = htmlspecialchars($loc['camera_id'] ?? '', ENT_QUOTES, 'UTF-8');
-                    ?>
-                    <option value="<?php echo $id; ?>"><?php echo "{$name} ({$cam})"; ?></option>
-                <?php endforeach; ?>
-            </select>
-
-            <button type="submit" class="btn-delete">ลบ</button>
-        </form>
+        <div class="form-container">
+            <h2><i class="fas fa-trash-alt"></i> ลบสถานที่</h2>
+            <form method="post" onsubmit="return confirm('ยืนยันการลบสถานที่นี้?');">
+                <input type="hidden" name="delete_location" value="1">
+                <div class="form-group">
+                    <label for="location_id">เลือกสถานที่ (ชื่อสถานที่ - กล้อง):</label>
+                    <select id="location_id" name="location_id" required>
+                        <option value="">เลือกสถานที่</option>
+                        <?php foreach ($locations as $loc): ?>
+                            <?php
+                                $id   = htmlspecialchars($loc['id'] ?? '', ENT_QUOTES, 'UTF-8');
+                                $name = htmlspecialchars($loc['location_name'] ?? '', ENT_QUOTES, 'UTF-8');
+                                $cam  = htmlspecialchars($loc['camera_id'] ?? '', ENT_QUOTES, 'UTF-8');
+                            ?>
+                            <option value="<?php echo $id; ?>"><?php echo "{$name} ({$cam})"; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <button type="submit" class="btn-delete">ลบ</button>
+            </form>
+        </div>
+            </div>
+        </div>
     </div>
-
-    <!-- ปุ่มด้านล่าง -->
-    <div class="button-container">
-        <button class="btn-back" onclick="window.location.href='profile.php'">ย้อนกลับ</button>
-        <button class="btn-back" type="button" onclick="toggleDeleteForm()">ลบข้อมูลสถานที่</button>
-    </div>
-
-    <script>
-      // ซ่อนส่วนลบทันทีทุกครั้งที่เข้าหน้า (โหลดใหม่)
-      document.addEventListener('DOMContentLoaded', function () {
-          const form = document.getElementById('deleteForm');
-          const btn  = document.getElementById('toggleDeleteBtn');
-          if (form) form.style.display = 'none';  // force hide on load
-          if (btn)  btn.textContent = 'ลบสถานที่'; // รีเซ็ตข้อความปุ่ม
-      });
-
-      function toggleDeleteForm() {
-          const form = document.getElementById('deleteForm');
-          const btn  = document.getElementById('toggleDeleteBtn');
-          const hidden = (form.style.display === 'none' || form.style.display === '');
-          form.style.display = hidden ? 'block' : 'none';
-          btn.textContent = hidden ? 'ยกเลิกการลบ' : 'ลบสถานที่';
-          if (!hidden) return;
-          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    </script>
 </body>
 </html>

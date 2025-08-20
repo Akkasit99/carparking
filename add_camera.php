@@ -92,81 +92,113 @@ $cameras = getAllCameras($supabase_url, $supabase_key);
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>จัดการกล้อง</title>
-    <link rel="stylesheet" href="css/add_admin.css">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการกล้อง - Car Parking Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>จัดการกล้อง</h1>
+    <div class="page-wrapper">
+        <!-- Background Shapes -->
+        <div class="page-background">
+        </div>
 
+        <!-- Modern Header -->
+        <header class="modern-header">
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="brand-logo">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="brand-text">
+                            <h1>จัดการกล้อง</h1>
+                            <span>Camera Management</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="header-nav">
+                        <a href="dashboard.php" class="nav-btn">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>ย้อนกลับ</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="content-container">
+            <div class="container">
         <?php if ($success): ?>
-            <div class="success"><?php echo htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?></div>
+            <div id="successMessage" class="success-message" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important; color: white !important; padding: 30px 50px !important; border-radius: 20px !important; font-size: 24px !important; font-weight: 700 !important; text-align: center !important; z-index: 9999 !important; box-shadow: 0 20px 60px rgba(40, 167, 69, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3) !important; border: 3px solid rgba(255, 255, 255, 0.3) !important; min-width: 300px !important; max-width: 500px !important; animation: successPulse 0.8s ease-out !important;">
+                ✓ <?php echo htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+            <script>
+                setTimeout(function() {
+                    const successMsg = document.getElementById('successMessage');
+                    if (successMsg) {
+                        successMsg.style.animation = 'fadeOut 0.5s ease-out forwards';
+                        setTimeout(() => successMsg.remove(), 500);
+                    }
+                }, 3000);
+            </script>
         <?php endif; ?>
         <?php if ($error): ?>
-            <div class="error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
+            <div id="errorMessage" class="error-message" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important; color: white !important; padding: 30px 50px !important; border-radius: 20px !important; font-size: 24px !important; font-weight: 700 !important; text-align: center !important; z-index: 9999 !important; box-shadow: 0 20px 60px rgba(220, 53, 69, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3) !important; border: 3px solid rgba(255, 255, 255, 0.3) !important; min-width: 300px !important; max-width: 500px !important; animation: errorShake 0.8s ease-out !important;">
+                ✕ <?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+            <script>
+                setTimeout(function() {
+                    const errorMsg = document.getElementById('errorMessage');
+                    if (errorMsg) {
+                        errorMsg.style.animation = 'fadeOut 0.5s ease-out forwards';
+                        setTimeout(() => errorMsg.remove(), 500);
+                    }
+                }, 4000);
+            </script>
         <?php endif; ?>
 
-        <!-- ฟอร์มเพิ่มกล้อง -->
-        <h2>เพิ่มกล้อง</h2>
-<div class="form-card">
-  <form method="post" autocomplete="off">
-      <label for="camera_id">รหัสกล้อง:</label>
-      <input type="text" id="camera_id" name="camera_id" required>
+        <div class="form-container">
+            <h2><i class="fas fa-plus-circle"></i> เพิ่มกล้อง</h2>
+            <form method="post" autocomplete="off">
+                <div class="form-group">
+                    <label for="camera_id">รหัสกล้อง:</label>
+                    <input type="text" id="camera_id" name="camera_id" placeholder="เช่น CAM1" required>
+                </div>
+                <div class="form-group">
+                    <label for="camera_name">ชื่อกล้อง:</label>
+                    <input type="text" id="camera_name" name="camera_name" placeholder="เช่น ทางเข้าลานจอด" required>
+                </div>
+                <div class="form-group">
+                    <label for="location">ตำแหน่ง:</label>
+                    <input type="text" id="location" name="location" placeholder="เช่น ทางเข้า" required>
+                </div>
+                <button type="submit" class="btn-submit">บันทึก</button>
+            </form>
+        </div>
 
-      <label for="camera_name">ชื่อกล้อง:</label>
-      <input type="text" id="camera_name" name="camera_name" required>
-
-      <label for="location">ตำแหน่ง:</label>
-      <input type="text" id="location" name="location" required>
-
-      <button type="submit" class="btn-submit">บันทึก</button>
-  </form>
-</div>
-
-<!-- ฟอร์มลบกล้อง -->
-<div id="deleteForm" style="display:none; margin-top:20px;">
-  <h2>ลบกล้อง</h2>
-  <div class="form-card">
-    <form method="post" autocomplete="off" onsubmit="return confirm('ยืนยันการลบกล้องนี้?');">
-        <label for="delete_id">เลือก ID กล้อง:</label>
-        <select id="delete_id" name="delete_id" required>
-            <option value="">-- เลือกกล้อง --</option>
-            <?php foreach ($cameras as $cam): ?>
-                <option value="<?php echo htmlspecialchars($cam['camera_id'], ENT_QUOTES, 'UTF-8'); ?>">
-                    <?php echo htmlspecialchars($cam['camera_id'] . ' - ' . $cam['camera_name'], ENT_QUOTES, 'UTF-8'); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-        <button type="submit" name="delete_camera" class="btn-delete">ลบกล้อง</button>
-    </form>
-  </div>
-</div>
-
-        <!-- ปุ่มควบคุม -->
-        <div class="button-container">
-            <button class="btn-back" onclick="window.location.href='profile.php'">ย้อนกลับ</button>
-            <button class="btn-back" type="button" onclick="toggleDeleteForm()" id="toggleDeleteBtn">ลบข้อมูลกล้อง</button>
+        <div class="form-container">
+            <h2><i class="fas fa-trash-alt"></i> ลบกล้อง</h2>
+            <form method="post" autocomplete="off" onsubmit="return confirm('ยืนยันการลบกล้องนี้?');">
+                <div class="form-group">
+                    <label for="delete_id">เลือก ID กล้อง:</label>
+                    <select id="delete_id" name="delete_id" required>
+                        <option value="">-- เลือกกล้อง --</option>
+                        <?php foreach ($cameras as $cam): ?>
+                            <option value="<?php echo htmlspecialchars($cam['camera_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php echo htmlspecialchars($cam['camera_id'] . ' - ' . $cam['camera_name'], ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <button type="submit" name="delete_camera" class="btn-delete">ลบกล้อง</button>
+            </form>
+        </div>
+            </div>
         </div>
     </div>
-
-    <script>
-      // รีเซ็ตเป็นซ่อนทุกครั้งที่โหลดหน้า
-      document.addEventListener('DOMContentLoaded', function () {
-          const form = document.getElementById('deleteForm');
-          const btn  = document.getElementById('toggleDeleteBtn');
-          form.style.display = 'none';
-          btn.textContent = 'ลบข้อมูลกล้อง';
-      });
-
-      function toggleDeleteForm() {
-          const form = document.getElementById('deleteForm');
-          const btn  = document.getElementById('toggleDeleteBtn');
-          const hidden = (form.style.display === 'none' || form.style.display === '');
-          form.style.display = hidden ? 'block' : 'none';
-          btn.textContent = hidden ? 'ยกเลิกการลบ' : 'ลบข้อมูลกล้อง';
-          if (hidden) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    </script>
 </body>
 </html>

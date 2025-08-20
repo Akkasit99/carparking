@@ -34,25 +34,100 @@ if (is_array($data) && count($data) > 0) {
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>ข้อมูลผู้ดูแลระบบ</title>
-    <link rel="stylesheet" href="css/profile.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อมูลผู้ดูแลระบบ - Car Parking Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="profile-box">
-        <h1>ข้อมูลผู้ใช้</h1>
-        <?php if ($userData): ?>
-            <div class="info">ชื่อผู้ใช้: <b><?php echo htmlspecialchars($userData['username']); ?></b></div>
-            <div class="info">ชื่อลานจอดรถ: <b><?php echo htmlspecialchars($userData['parking_name']); ?></b></div>
-            <div class="info">สถานะ: <b><?php echo htmlspecialchars($userData['position']); ?></b></div>
-        <?php else: ?>
-            <div class="info" style="color:red;">ไม่พบข้อมูลผู้ใช้</div>
-        <?php endif; ?>
-        <div>
-            <button class="btn-back" onclick="window.location.href='dashboard.php'" style="background-color: #ff7043; color: white;">ย้อนกลับ</button>
-            <button class="btn-back" onclick="window.location.href='add_camera.php'" style="margin-left:10px;">จัดการกล้อง</button>
-            <button class="btn-back" onclick="window.location.href='add_location.php'" style="margin-left:10px;">จัดการสถานที่</button>
+    <div class="page-wrapper">
+        <!-- Background Shapes -->
+        <div class="page-background">
         </div>
-        
+
+        <!-- Modern Header -->
+        <header class="modern-header">
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="brand-logo">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="brand-text">
+                            <h1>ข้อมูลผู้ดูแลระบบ</h1>
+                            <span>Administrator Profile</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="header-nav">
+                        <a href="dashboard.php" class="nav-btn">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>ย้อนกลับ</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="page-main">
+            <div class="page-container">
+                <div class="profile-section">
+                    <?php if ($userData): ?>
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-avatar">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <div class="profile-title">
+                                    <h2><?php echo htmlspecialchars($userData['username']); ?></h2>
+                                    <span class="profile-subtitle">ผู้ดูแลระบบ</span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-details">
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <label>ชื่อผู้ใช้</label>
+                                        <span><?php echo htmlspecialchars($userData['username']); ?></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-parking"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <label>ชื่อลานจอดรถ</label>
+                                        <span><?php echo htmlspecialchars($userData['parking_name']); ?></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-user-tag"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <label>ตำแหน่ง</label>
+                                        <span><?php echo htmlspecialchars($userData['position']); ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>ไม่พบข้อมูลผู้ใช้</span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </main>
     </div>
 </body>
 </html>

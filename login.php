@@ -25,8 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
         header("Location: dashboard.php");
         exit();
     } else {
-        echo "<h2 style='color:red; text-align:center;'>ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</h2>";
-        echo "<p style='text-align:center;'><a href='index.php'>กลับไปหน้าล็อกอิน</a></p>";
+        $_SESSION['login_error'] = 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
+        header("Location: index.php");
+        exit();
     }
 } else {
     header("Location: index.php");
