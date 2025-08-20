@@ -54,14 +54,17 @@
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $name = trim($_POST['username']);
       $password = trim($_POST['password']);
+      $email = trim($_POST['email']); // เพิ่มบรรทัดนี้
       $parking_name = trim($_POST['parking_name']);
       $position = trim($_POST['position']);
       $created_by = trim($_POST['created_by']);
-      if ($name && $password && $parking_name && $position && $created_by) {
+      
+      if ($name && $password && $email && $parking_name && $position && $created_by) { // เพิ่ม $email ในเงื่อนไข
         $url = $supabase_url . "/rest/v1/users";
         $data = [
           "username" => $name,
           "password" => $password,
+          "email" => $email, // เพิ่มบรรทัดนี้
           "parking_name" => $parking_name,
           "position" => $position,
           "created_by" => $created_by
@@ -138,20 +141,29 @@
     <form method="post" autocomplete="off">
       <div class="form-group">
         <label for="username">ชื่อ</label>
-        <input type="text" id="username" name="username" placeholder="เช่น amdin" required>
+        <input type="text" id="username" name="username" placeholder="เช่น admin" required>
       </div>
+      
       <div class="form-group">
         <label for="password">รหัสผ่าน</label>
         <input type="password" id="password" name="password" placeholder="เช่น 123" required>
       </div>
+      
+      <div class="form-group">
+        <label for="email">อีเมล</label>
+        <input type="email" id="email" name="email" placeholder="เช่น admin@example.com" required>
+      </div>
+      
       <div class="form-group">
         <label for="parking_name">ชื่อลานจอดรถ</label>
         <input type="text" id="parking_name" name="parking_name" placeholder="เช่น โรงเรียน" required>
       </div>
+      
       <div class="form-group">
         <label for="position">ตำแหน่งของบุคคล</label>
         <input type="text" id="position" name="position" placeholder="เช่น ผู้ดูแลระบบ" required>
       </div>
+      
       <div class="form-group">
         <label for="created_by">คนที่เพิ่มข้อมูล</label>
         <select id="created_by" name="created_by" required>
@@ -159,8 +171,9 @@
           <?php echo $userOptions; ?>
         </select>
       </div>
+      
       <button type="submit" class="btn-submit">เพิ่มผู้ดูแลระบบ</button>
-            </form>
+    </form>
             </div>
         </div>
     </div>

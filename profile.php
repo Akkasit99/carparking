@@ -100,6 +100,16 @@ if (is_array($data) && count($data) > 0) {
                                 
                                 <div class="detail-item">
                                     <div class="detail-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <label>อีเมล</label>
+                                        <span><?php echo htmlspecialchars($userData['email']); ?></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <div class="detail-icon">
                                         <i class="fas fa-parking"></i>
                                     </div>
                                     <div class="detail-content">
