@@ -156,26 +156,43 @@ $selected_time = isset($_GET['time']) ? $_GET['time'] : '00:00';
     </div>
     
     <script>
-        const imagesData = <?php echo json_encode($imagesData); ?>;
+    const imagesData = <?php echo json_encode($imagesData); ?>;
+    
+    function openModal(imgSrc) {
+        const modal = document.getElementById('imgModal');
+        const modalImg = document.getElementById('modalImg');
         
-        function openModal(imgSrc) {
-            const modal = document.getElementById('imgModal');
-            const modalImg = document.getElementById('modalImg');
-            modal.style.display = 'block';
+        if (modal && modalImg) {
             modalImg.src = imgSrc;
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
         }
-        
-        function closeModal() {
-            document.getElementById('imgModal').style.display = 'none';
+    }
+    
+    function closeModal() {
+        const modal = document.getElementById('imgModal');
+        if (modal) {
+            modal.classList.remove('open');
+            document.body.style.overflow = 'auto';
         }
-        
-        function resetFilter() {
-            window.location.href = window.location.pathname;
+    }
+    
+    function resetFilter() {
+        window.location.href = window.location.pathname;
+    }
+    
+    // Event listeners
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+    
+    // คลิกพื้นหลังเพื่อปิด
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('imgModal');
+        if (e.target === modal) {
+            closeModal();
         }
-        
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeModal();
-        });
+    });
     </script>
 </body>
 </html>
