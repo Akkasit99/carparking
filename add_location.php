@@ -409,3 +409,35 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </html>
+<style>
+/* CSS เดิมที่มีอยู่... */
+
+/* เพิ่ม CSS สำหรับ h2 สีขาว */
+h2 {
+    color: white !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+    font-weight: 600 !important;
+    margin-bottom: 20px !important;
+}
+
+/* ไอคอนใน h2 */
+h2 i {
+    color: white !important;
+    margin-right: 10px !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* เอฟเฟกต์ hover */
+h2:hover {
+    text-shadow: 0 2px 8px rgba(255, 255, 255, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    h2 {
+        font-size: 1.5rem !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+    }
+}
+</style>
