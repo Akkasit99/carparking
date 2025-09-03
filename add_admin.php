@@ -177,5 +177,57 @@
             </div>
         </div>
     </div>
+<!-- เพิ่มก่อน </body> -->
+<script>
+// ฟังก์ชันรีเซ็ตฟอร์ม
+function resetForm() {
+    const form = document.querySelector('form');
+    if (form) {
+        form.reset();
+    }
+    
+    // ล้าง URL parameters
+    if (window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
+// เพิ่ม Event Listener เมื่อโหลดหน้าเสร็จ
+document.addEventListener('DOMContentLoaded', function() {
+    // รีเซ็ตฟอร์มเมื่อโหลดหน้า
+    resetForm();
+    
+    // เพิ่ม Event Listener สำหรับการรีเฟรชหน้า
+    window.addEventListener('beforeunload', function() {
+        resetForm();
+    });
+    
+    // รีเซ็ตฟอร์มเมื่อกดปุ่ม F5 หรือ Ctrl+R
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+            resetForm();
+        }
+    });
+});
+
+// รีเซ็ตฟอร์มเมื่อมีการ navigation
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        resetForm();
+    }
+});
+
+// เพิ่มฟังก์ชันสำหรับรีเฟรชหลังดำเนินการสำเร็จ
+window.addEventListener('load', function() {
+    // ตรวจสอบว่ามีข้อความสำเร็จหรือไม่
+    const successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+        // รอให้แสดงข้อความเสร็จแล้วรีเซ็ตฟอร์ม
+        setTimeout(function() {
+            resetForm();
+        }, 3500); // รอหลังจากข้อความหายไป
+    }
+});
+</script>
 </body>
 </html>

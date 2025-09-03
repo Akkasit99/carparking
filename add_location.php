@@ -76,6 +76,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_location'])) {
             'return=minimal'
         );
         $success = ($httpAdd === 201 || $httpAdd === 204) ? "เพิ่มสถานที่สำเร็จ!" : "เกิดข้อผิดพลาดในการเพิ่มสถานที่ (HTTP {$httpAdd})";
+        
+        // เพิ่มการรีเฟรชหลังบันทึกสำเร็จ
+        if ($httpAdd === 201 || $httpAdd === 204) {
+            echo "<script>
+                setTimeout(function() {
+                    window.location.href = window.location.pathname;
+                }, 1500);
+            </script>";
+        }
     } else {
         $error = "กรุณากรอกข้อมูลให้ครบถ้วน";
     }
@@ -88,6 +97,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location'])) {
         $url = $supabase_url . "/rest/v1/locations?id=eq." . urlencode($location_id);
         list($httpDel) = call_supabase('DELETE', $url, $supabase_key, null, 'return=minimal');
         $success = ($httpDel === 204) ? "ลบสถานที่สำเร็จ!" : "เกิดข้อผิดพลาดในการลบสถานที่ (HTTP {$httpDel})";
+        
+        // เพิ่มการรีเฟรชหลังลบำเร็จ
+        if ($httpDel === 204) {
+            echo "<script>
+                setTimeout(function() {
+                    window.location.href = window.location.pathname;
+                }, 1500);
+            </script>";
+        }
     } else {
         $error = "กรุณาเลือกสถานที่ที่จะลบ";
     }
@@ -281,9 +299,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location'])) {
                     <label for="camera_id">กล้อง:</label>
                     <select id="camera_id" name="camera_id" required>
                         <option value="">เลือกกล้อง</option>
+                        <!-- รูปแบบที่เรียบง่าย -->
                         <?php foreach ($cameras as $camera): ?>
-                            <option value="<?php echo htmlspecialchars(trim($camera['camera_id'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
-                                <?php echo htmlspecialchars($camera['camera_name'] ?? ($camera['camera_id'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>
+                            <?php
+                                $cam_id = htmlspecialchars(trim($camera['camera_id'] ?? ''), ENT_QUOTES, 'UTF-8');
+                                $cam_name = htmlspecialchars($camera['camera_name'] ?? 'ไม่มีชื่อ', ENT_QUOTES, 'UTF-8');
+                            ?>
+                            <option value="<?php echo $cam_id; ?>">
+                                <?php echo "({$cam_id}) {$cam_name}"; ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -300,13 +323,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location'])) {
                     <label for="location_id">เลือกสถานที่ (ชื่อสถานที่ - กล้อง):</label>
                     <select id="location_id" name="location_id" required>
                         <option value="">เลือกสถานที่</option>
+                        <!-- แก้ไขส่วน dropdown ลบสถานที่ทั้งหมด (บรรทัดที่ 321-329) -->
                         <?php foreach ($locations as $loc): ?>
                             <?php
                                 $id   = htmlspecialchars($loc['id'] ?? '', ENT_QUOTES, 'UTF-8');
                                 $name = htmlspecialchars($loc['location_name'] ?? '', ENT_QUOTES, 'UTF-8');
                                 $cam  = htmlspecialchars($loc['camera_id'] ?? '', ENT_QUOTES, 'UTF-8');
+                                
+                                // หาชื่อกล้องจาก camera_id
+                                $camera_name = 'ไม่พบข้อมูลกล้อง';
+                                foreach ($cameras as $camera) {
+                                    if ($camera['camera_id'] === $cam) {
+                                        $camera_name = $camera['camera_name'] ?? 'ไม่มีชื่อ';
+                                        break;
+                                    }
+                                }
                             ?>
-                            <option value="<?php echo $id; ?>"><?php echo "{$name} ({$cam})"; ?></option>
+                            <option value="<?php echo $id; ?>">
+                                <?php echo "{$name} - ({$cam}) {$camera_name}"; ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -408,8 +443,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-</html>
-<style>
+</html><style>
 /* CSS เดิมที่มีอยู่... */
 
 /* เพิ่ม CSS สำหรับ h2 สีขาว */
@@ -441,3 +475,103 @@ h2:hover {
     }
 }
 </style>
+
+<!-- เพิ่ม JavaScript สำหรับรีเซ็ตฟอร์มหลังรีเฟรช -->
+<script>
+// ฟังก์ชันรีเซ็ตฟอร์มทั้งหมด
+function resetAllForms() {
+    // รีเซ็ตฟอร์มเพิ่มสถานที่
+    const addForm = document.getElementById('addLocationForm');
+    if (addForm) {
+        addForm.reset();
+    }
+    
+    // รีเซ็ตฟอร์มลบสถานที่
+    const deleteForm = document.getElementById('deleteLocationForm');
+    if (deleteForm) {
+        deleteForm.reset();
+    }
+    
+    // ซ่อนตารางสถานที่
+    const tableContainer = document.getElementById('locationTableContainer');
+    const toggleBtn = document.getElementById('toggleLocationTable');
+    if (tableContainer && toggleBtn) {
+        tableContainer.style.display = 'none';
+        toggleBtn.innerHTML = '<i class="fas fa-eye"></i> แสดงตารางสถานที่';
+        toggleBtn.classList.remove('active');
+    }
+    
+    // ล้าง URL parameters
+    if (window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
+// ฟังก์ชันแสดง/ซ่อนตาราง
+function toggleLocationTable() {
+    const tableContainer = document.getElementById('locationTableContainer');
+    const toggleBtn = document.getElementById('toggleLocationTable');
+    
+    if (tableContainer.style.display === 'none' || tableContainer.style.display === '') {
+        tableContainer.style.display = 'block';
+        toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> ซ่อนตารางสถานที่';
+        toggleBtn.classList.add('active');
+        
+        // เพิ่มแอนิเมชัน
+        tableContainer.style.opacity = '0';
+        tableContainer.style.transform = 'translateY(-20px)';
+        setTimeout(() => {
+            tableContainer.style.transition = 'all 0.3s ease';
+            tableContainer.style.opacity = '1';
+            tableContainer.style.transform = 'translateY(0)';
+        }, 10);
+    } else {
+        tableContainer.style.display = 'none';
+        toggleBtn.innerHTML = '<i class="fas fa-eye"></i> แสดงตารางสถานที่';
+        toggleBtn.classList.remove('active');
+    }
+}
+
+// เพิ่ม Event Listener เมื่อโหลดหน้าเสร็จ
+document.addEventListener('DOMContentLoaded', function() {
+    // รีเซ็ตฟอร์มทั้งหมดเมื่อโหลดหน้า
+    resetAllForms();
+    
+    // เพิ่ม Event Listener สำหรับปุ่ม toggle
+    const toggleBtn = document.getElementById('toggleLocationTable');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleLocationTable);
+    }
+    
+    // เพิ่ม Event Listener สำหรับการรีเฟรชหน้า
+    window.addEventListener('beforeunload', function() {
+        resetAllForms();
+    });
+    
+    // รีเซ็ตฟอร์มเมื่อกดปุ่ม F5 หรือ Ctrl+R
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+            resetAllForms();
+        }
+    });
+});
+
+// รีเซ็ตฟอร์มเมื่อมีการ navigation
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        resetAllForms();
+    }
+});
+
+// เพิ่มฟังก์ชันสำหรับรีเฟรชหลังดำเนินการสำเร็จ
+window.addEventListener('load', function() {
+    // ตรวจสอบว่ามีข้อความสำเร็จหรือไม่มี
+    const successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+        // รอให้แสดงข้อความเสร็จแล้วรีเซ็ตฟอร์ม
+        setTimeout(function() {
+            resetAllForms();
+        }, 3500); // รอหลังจากข้อความหายไป
+    }
+});
+</script>
