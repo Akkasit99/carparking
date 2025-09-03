@@ -66,7 +66,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: add_camera.php?success=' . urlencode('เพิ่มกล้องสำเร็จ!'));
                 exit();
             } else {
-                header('Location: add_camera.php?error=' . urlencode('เกิดข้อผิดพลาด: ' . ($response ?? 'ไม่ทราบสาเหตุ')));
+                $error_message = 'เกิดข้อผิดพลาดในการเพิ่มกล้อง Topview';
+                if (isset($_SESSION['error_details']) && !empty($_SESSION['error_details'])) {
+                    $error_message .= ': ' . implode('; ', $_SESSION['error_details']);
+                    // ล้างข้อมูลหลังจากใช้งาน
+                    unset($_SESSION['error_details']);
+                }
+                header('Location: add_camera.php?error=' . urlencode($error_message));
                 exit();
             }
         } else {
@@ -109,6 +115,185 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
     }
+    
+    // ฟอร์มเพิ่มกล้อง Topview
+    if (isset($_POST['add_topview_camera'])) {
+        $slot_id = intval(trim($_POST['topview_slot_id'] ?? 0));
+        $lane = intval(trim($_POST['topview_lane'] ?? 0));
+        $camera_id = trim($_POST['topview_camera_id'] ?? '');
+        $location_id = intval(trim($_POST['topview_location_id'] ?? 0));
+
+        if ($slot_id > 0 && $lane > 0 && $camera_id && $location_id > 0) {
+            $success_count = 0;
+            $error_count = 0;
+
+            // ทำการ insert ข้อมูลตามจำนวน slot_id ที่ระบุ
+            // สร้างตัวแปรเก็บค่า slot_id สูงสุดที่มีอยู่แล้ว
+            $max_slot_id = 0;
+            
+            // ดึงค่า slot_id สูงสุดจากฐานข้อมูล
+            $url_max = $supabase_url . "/rest/v1/parking_slots_status?select=slot_id&order=slot_id.desc&limit=1";
+            $ch_max = curl_init($url_max);
+            curl_setopt($ch_max, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch_max, CURLOPT_HTTPHEADER, [
+                "apikey: $supabase_key",
+                "Authorization: Bearer $supabase_key"
+            ]);
+            $response_max = curl_exec($ch_max);
+            curl_close($ch_max);
+            
+            // แปลงข้อมูล JSON เป็น array
+            $max_data = json_decode($response_max, true);
+            if (!empty($max_data) && isset($max_data[0]['slot_id'])) {
+                $max_slot_id = intval($max_data[0]['slot_id']);
+            }
+            
+            // เริ่มบันทึกข้อมูลจาก slot_id ถัดไป
+            for ($i = 1; $i <= $slot_id; $i++) {
+                $current_slot_id = $max_slot_id + $i;
+                
+                // บันทึกข้อมูลลงในตาราง parking_slots_status
+                $url = $supabase_url . "/rest/v1/parking_slots_status";
+                $data = [
+                    "slot_id" => $current_slot_id, // ใช้ค่า slot_id ที่ต่อเนื่องจากค่าสูงสุดที่มีอยู่
+                    "lane" => $lane,
+                    "camera_id" => $camera_id,
+                    "location_id" => $location_id,
+                    "status" => "F" // เพิ่มค่า status เพื่อไม่ให้เป็น null
+                ];
+
+                $ch = curl_init($url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data, JSON_UNESCAPED_UNICODE));
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    "apikey: $supabase_key",
+                    "Authorization: Bearer $supabase_key",
+                    "Content-Type: application/json",
+                    "Prefer: return=representation"
+                ]);
+                $response = curl_exec($ch);
+                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $curl_error = curl_error($ch);
+                curl_close($ch);
+                
+                // เก็บข้อมูลข้อผิดพลาดเพื่อตรวจสอบ
+                if (!isset($_SESSION['debug_info'])) {
+                    $_SESSION['debug_info'] = [];
+                }
+                $_SESSION['debug_info'][] = [
+                    'slot_id' => $i,
+                    'http_code' => $http_code,
+                    'response' => $response,
+                    'curl_error' => $curl_error
+                ];
+                
+                if ($http_code === 201) {
+                    $success_count++;
+                } else {
+                    $error_count++;
+                }
+            }
+
+            // ลบการบันทึกข้อมูลซ้ำซ้อนหลังลูป for ทั้งหมด
+            // ถ้าต้องการบันทึกข้อมูลลงในตาราง topview_camera ให้เปลี่ยน URL เป็นตารางที่ถูกต้อง
+            $url = $supabase_url . "/rest/v1/parking_slots_status";
+            $data = [
+                "slot_id" => $i,
+                "lane" => $lane,
+                "camera_id" => $camera_id,
+                "location_id" => $location_id
+            ];
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data, JSON_UNESCAPED_UNICODE));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                "apikey: $supabase_key",
+                "Authorization: Bearer $supabase_key",
+                "Content-Type: application/json",
+                "Prefer: return=representation"
+            ]);
+            $response = curl_exec($ch);
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            
+            // บันทึกข้อมูลลงในตาราง parking_slots_status
+            if ($http_code === 201) {
+                $url_status = $supabase_url . "/rest/v1/parking_slots_status";
+                $data_status = [
+                    "slot_id" => $i,
+                    "lane" => $lane,
+                    "camera_id" => $camera_id,
+                    "location_id" => $location_id,
+                    "status" => "F" // เพิ่มค่า status เป็น available
+                ];
+                
+                $ch_status = curl_init($url_status);
+                curl_setopt($ch_status, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch_status, CURLOPT_POST, true);
+                curl_setopt($ch_status, CURLOPT_POSTFIELDS, json_encode($data_status, JSON_UNESCAPED_UNICODE));
+                curl_setopt($ch_status, CURLOPT_HTTPHEADER, [
+                    "apikey: $supabase_key",
+                    "Authorization: Bearer $supabase_key",
+                    "Content-Type: application/json",
+                    "Prefer: return=representation"
+                ]);
+                $response_status = curl_exec($ch_status);
+                $http_code_status = curl_getinfo($ch_status, CURLINFO_HTTP_CODE);
+                $curl_error = curl_error($ch_status);
+                curl_close($ch_status);
+                
+                // เก็บข้อมูลข้อผิดพลาดเพื่อตรวจสอบ
+                if (!isset($_SESSION['debug_info'])) {
+                    $_SESSION['debug_info'] = [];
+                }
+                $_SESSION['debug_info'][] = [
+                    'slot_id' => $i,
+                    'http_code' => $http_code_status,
+                    'response' => $response_status,
+                    'curl_error' => $curl_error
+                ];
+                
+                if ($http_code_status === 201) {
+                    $success_count++;
+                } else {
+                    $error_count++;
+                }
+            }
+
+            // สร้าง token ใหม่หลังการประมวลผล
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
+            if ($success_count > 0) {
+                $message = "เพิ่มกล้อง Topview สำเร็จ $success_count รายการ";
+                if ($error_count > 0) {
+                    $message .= " (ล้มเหลว $error_count รายการ)";
+                    // เพิ่มข้อมูลการดีบัก
+                    if (isset($_SESSION['debug_info'])) {
+                        $message .= " - ข้อมูลข้อผิดพลาด: " . json_encode($_SESSION['debug_info'], JSON_UNESCAPED_UNICODE);
+                    }
+                }
+                header('Location: add_camera.php?success=' . urlencode($message));
+                exit();
+            } else {
+                $error_message = 'เกิดข้อผิดพลาดในการเพิ่มกล้อง Topview';
+                // เพิ่มข้อมูลการดีบัก
+                if (isset($_SESSION['debug_info'])) {
+                    $error_message .= " - ข้อมูลข้อผิดพลาด: " . json_encode($_SESSION['debug_info'], JSON_UNESCAPED_UNICODE);
+                    // ล้างข้อมูลหลังจากใช้งาน
+                    unset($_SESSION['debug_info']);
+                }
+                header('Location: add_camera.php?error=' . urlencode($error_message));
+                exit();
+            }
+        } else {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            header('Location: add_camera.php?error=' . urlencode('กรุณากรอกข้อมูลให้ครบถ้วน'));
+            exit();
+        }
+    }
 }
 
 // ดึงข้อมูลกล้องทั้งหมด
@@ -127,6 +312,23 @@ function getAllCameras($supabase_url, $supabase_key) {
     return [];
 }
 $cameras = getAllCameras($supabase_url, $supabase_key);
+
+// ดึงข้อมูลสถานที่ทั้งหมด
+function getAllLocations($supabase_url, $supabase_key) {
+    $url = $supabase_url . "/rest/v1/locations?select=id,location_name";
+    $ch  = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "apikey: $supabase_key",
+        "Authorization: Bearer $supabase_key"
+    ]);
+    $response  = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if ($http_code === 200) return json_decode($response, true);
+    return [];
+}
+$locations = getAllLocations($supabase_url, $supabase_key);
 
 // ดึงรายชื่อผู้ใช้จากตาราง users คอลัมน์ username
 function getAllUsers($supabase_url, $supabase_key) {
@@ -377,6 +579,53 @@ $users = getAllUsers($supabase_url, $supabase_key);
         </div>
     </div>
 
+        <!-- เพิ่มฟอร์มสำหรับกล้อง topview -->
+        <div class="form-container">
+            <h2><i class="fas fa-video"></i> เพิ่มกล้อง Topview</h2>
+            <form method="post" autocomplete="off">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="add_topview_camera" value="1">
+                
+                <div class="form-group">
+                    <label for="topview_slot_id">จำนวนช่องจอด:</label>
+                    <input type="number" id="topview_slot_id" name="topview_slot_id" placeholder="เช่น 5 (จำนวน 5 ครั้ง บันทึกข้อมูล 5 ครั้ง)" min="1" required>
+                </div>
+                
+                <!-- ลบช่องสถานะออก -->
+                
+                <div class="form-group">
+                    <label for="topview_lane">ลานจอด:</label>
+                    <input type="number" id="topview_lane" name="topview_lane" placeholder="เช่น 1" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="topview_camera_id">กล้อง:</label>
+                    <select id="topview_camera_id" name="topview_camera_id" required>
+                        <option value="">-- เลือกกล้อง --</option>
+                        <?php foreach ($cameras as $cam): ?>
+                            <option value="<?php echo htmlspecialchars($cam['camera_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php echo htmlspecialchars('(' . $cam['camera_id'] . ') ' . $cam['camera_name'], ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="topview_location_id">สถานที่:</label>
+                    <select id="topview_location_id" name="topview_location_id" required>
+                        <option value="">-- เลือกสถานที่ --</option>
+                        <?php foreach ($locations as $loc): ?>
+                            <option value="<?php echo htmlspecialchars($loc['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php echo htmlspecialchars('(' . $loc['id'] . ') ' . $loc['location_name'], ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-submit">บันทึกกล้อง Topview</button>
+            </form>
+        </div>
+
         <!-- ปุ่มแสดงตารางกล้อง -->
         <div class="form-container">
             <h2><i class="fas fa-table"></i> แสดงข้อมูลกล้องทั้งหมด</h2>
@@ -592,3 +841,7 @@ h2:hover {
     }
 }
 </style>
+
+</script>
+</html>
+           
