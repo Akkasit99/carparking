@@ -93,40 +93,6 @@
           $error = 'กรุณากรอกข้อมูลให้ครบถ้วน';
         }
       }
-      
-      // ลบผู้ดูแลระบบ
-      if (isset($_POST['delete_admin'])) {
-        $delete_username = trim($_POST['delete_username'] ?? '');
-        
-        if ($delete_username) {
-          // ตรวจสอบว่าไม่ใช่ผู้ใช้ที่กำลัง login อยู่
-          if ($delete_username === $_SESSION['user']) {
-            $error = 'ไม่สามารถลบบัญชีของตัวเองได้';
-          } else {
-            // ลบข้อมูลผู้ดูแลระบบ
-            $url = $supabase_url . "/rest/v1/users?username=eq." . urlencode($delete_username);
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-              "apikey: $supabase_key",
-              "Authorization: Bearer $supabase_key",
-              "Content-Type: application/json"
-            ]);
-            $response = curl_exec($ch);
-            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-            
-            if ($http_code === 204) {
-              $success = 'ลบผู้ดูแลระบบสำเร็จ!';
-            } else {
-              $error = 'เกิดข้อผิดพลาดในการลบ: ' . ($response ?? 'ไม่ทราบสาเหตุ');
-            }
-          }
-        } else {
-          $error = 'กรุณาเลือกผู้ดูแลระบบที่ต้องการลบ';
-        }
-      }
     }
     // ดึงรายชื่อผู้ใช้ (dropdown)
     $url = $supabase_url . "/rest/v1/users?select=id,username";
@@ -210,23 +176,6 @@
       </div>
       
       <button type="submit" class="btn-submit">เพิ่มผู้ดูแลระบบ</button>
-    </form>
-    
-    <!-- ฟอร์มลบผู้ดูแลระบบ -->
-    <form method="post" autocomplete="off" onsubmit="return confirm('ยืนยันการลบผู้ดูแลระบบนี้?');" style="margin-top: 30px; padding-top: 30px; border-top: 2px solid #e9ecef;">
-      <h2 style="color: #dc3545; margin-bottom: 20px;"><i class="fas fa-trash-alt"></i> ลบผู้ดูแลระบบ</h2>
-      
-      <div class="form-group">
-        <label for="delete_username">เลือกผู้ดูแลระบบที่ต้องการลบ</label>
-        <select id="delete_username" name="delete_username" required>
-          <option value="">-- เลือกผู้ดูแลระบบ --</option>
-          <?php echo $userOptions; ?>
-        </select>
-      </div>
-      
-      <button type="submit" name="delete_admin" class="btn-delete" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-        <i class="fas fa-trash-alt"></i> ลบผู้ดูแลระบบ
-      </button>
     </form>
             </div>
         </div>
