@@ -95,7 +95,7 @@ if (isset($_SESSION['logout_success'])) {
         <div class="form-group">
           <div class="input-wrapper">
             <i class="fas fa-user"></i>
-            <input type="text" id="username" name="username" placeholder="ชื่อผู้ใช้" required>
+            <input type="text" id="username" name="username" placeholder="ชื่อผู้ใช้ หรือ อีเมล" required>
           </div>
         </div>
         

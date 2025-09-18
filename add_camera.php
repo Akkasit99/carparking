@@ -29,8 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // ฟอร์มเพิ่มกล้อง
-    if (isset($_POST['camera_id'], $_POST['camera_name'], $_POST['location'], $_POST['created_by'])) {
+    // ฟอร์มเพิ่มกล้องปกติ (ไม่ใช่ topview)
+    if (isset($_POST['camera_id'], $_POST['camera_name'], $_POST['location'], $_POST['created_by']) && !isset($_POST['add_topview_camera'])) {
         $camera_id   = trim($_POST['camera_id']);
         $camera_name = trim($_POST['camera_name']);
         $location    = trim($_POST['location']);
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
                 "camera_id" => $camera_id, 
                 "camera_name" => $camera_name, 
-                "location" => $location,
+                "position" => $location,
                 "created_by" => $created_by
             ];
 
@@ -63,14 +63,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
             if ($http_code === 201) {
-                header('Location: add_camera.php?success=' . urlencode('เพิ่มกล้องสำเร็จ!'));
+                header('Location: add_camera.php?success=' . urlencode('เพิ่มกล้องปกติสำเร็จ!'));
                 exit();
             } else {
-                $error_message = 'เกิดข้อผิดพลาดในการเพิ่มกล้อง Topview';
-                if (isset($_SESSION['error_details']) && !empty($_SESSION['error_details'])) {
-                    $error_message .= ': ' . implode('; ', $_SESSION['error_details']);
-                    // ล้างข้อมูลหลังจากใช้งาน
-                    unset($_SESSION['error_details']);
+                $error_message = 'เกิดข้อผิดพลาดในการเพิ่มกล้องปกติ';
+                if ($response) {
+                    $error_data = json_decode($response, true);
+                    if (isset($error_data['message'])) {
+                        $error_message .= ': ' . $error_data['message'];
+                    } else {
+                        $error_message .= ': ' . $response;
+                    }
                 }
                 header('Location: add_camera.php?error=' . urlencode($error_message));
                 exit();
@@ -86,8 +89,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete_camera'])) {
         $delete_id = trim($_POST['delete_id'] ?? '');
         if ($delete_id) {
-            $url = $supabase_url . "/rest/v1/camera?camera_id=eq." . urlencode($delete_id);
+            $deletion_errors = [];
+            $deletion_success = [];
+            
+            // 1. ลบข้อมูลที่เกี่ยวข้องในตาราง parking_slots_status ก่อน
+            $url_parking = $supabase_url . "/rest/v1/parking_slots_status?camera_id=eq." . urlencode($delete_id);
+            $ch_parking = curl_init($url_parking);
+            curl_setopt($ch_parking, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch_parking, CURLOPT_CUSTOMREQUEST, "DELETE");
+            curl_setopt($ch_parking, CURLOPT_HTTPHEADER, [
+                "apikey: $supabase_key",
+                "Authorization: Bearer $supabase_key"
+            ]);
+            $parking_response = curl_exec($ch_parking);
+            $parking_http_code = curl_getinfo($ch_parking, CURLINFO_HTTP_CODE);
+            curl_close($ch_parking);
+            
+            if ($parking_http_code === 204 || $parking_http_code === 200) {
+                $deletion_success[] = "ลบสำเร็จ";
+            } elseif ($parking_http_code !== 404) {
+                $deletion_errors[] = "ลบไม่สำเร็จ";
+            }
 
+            // 2. ลบข้อมูลใน entrance
+            $url_entrance = $supabase_url . "/rest/v1/entrance?camera_id=eq." . urlencode($delete_id);
+            $ch_entrance = curl_init($url_entrance);
+            curl_setopt($ch_entrance, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch_entrance, CURLOPT_CUSTOMREQUEST, "DELETE");
+            curl_setopt($ch_entrance, CURLOPT_HTTPHEADER, [
+                "apikey: $supabase_key",
+                "Authorization: Bearer $supabase_key"
+            ]);
+            $entrance_response = curl_exec($ch_entrance);
+            $entrance_http_code = curl_getinfo($ch_entrance, CURLINFO_HTTP_CODE);
+            curl_close($ch_entrance);
+            
+            if ($entrance_http_code === 204 || $entrance_http_code === 200) {
+                $deletion_success[] = "ลบสำเร็จ";
+            } elseif ($entrance_http_code !== 404) {
+                $deletion_errors[] = "ลบไม่สำเร็จ";
+            }
+
+            // 3. ลบข้อมูลใน parking_exit
+            $url_exit = $supabase_url . "/rest/v1/parking_exit?camera_id=eq." . urlencode($delete_id);
+            $ch_exit = curl_init($url_exit);
+            curl_setopt($ch_exit, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch_exit, CURLOPT_CUSTOMREQUEST, "DELETE");
+            curl_setopt($ch_exit, CURLOPT_HTTPHEADER, [
+                "apikey: $supabase_key",
+                "Authorization: Bearer $supabase_key"
+            ]);
+            $exit_response = curl_exec($ch_exit);
+            $exit_http_code = curl_getinfo($ch_exit, CURLINFO_HTTP_CODE);
+            curl_close($ch_exit);
+            
+            if ($exit_http_code === 204 || $exit_http_code === 200) {
+                $deletion_success[] = "ลบสำเร็จ";
+            } elseif ($exit_http_code !== 404) {
+                $deletion_errors[] = "ลบไม่สำเร็จ";
+            }
+
+            // 4. ลบข้อมูลใน parking_lot
+            $url_parking_lot = $supabase_url . "/rest/v1/parking_lot?camera_id=eq." . urlencode($delete_id);
+            $ch_parking_lot = curl_init($url_parking_lot);
+            curl_setopt($ch_parking_lot, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch_parking_lot, CURLOPT_CUSTOMREQUEST, "DELETE");
+            curl_setopt($ch_parking_lot, CURLOPT_HTTPHEADER, [
+                "apikey: $supabase_key",
+                "Authorization: Bearer $supabase_key"
+            ]);
+            $parking_lot_response = curl_exec($ch_parking_lot);
+            $parking_lot_http_code = curl_getinfo($ch_parking_lot, CURLINFO_HTTP_CODE);
+            curl_close($ch_parking_lot);
+            
+            if ($parking_lot_http_code === 204 || $parking_lot_http_code === 200) {
+                $deletion_success[] = "ลบสำเร็จ";
+            } elseif ($parking_lot_http_code !== 404) {
+                $deletion_errors[] = "ลบไม่สำเร็จ";
+            }
+
+            // 5. ลบข้อมูลสถานที่ที่ใช้กล้องนี้
+            $url_locations = $supabase_url . "/rest/v1/locations?camera_id=eq." . urlencode($delete_id);
+            $ch_locations = curl_init($url_locations);
+            curl_setopt($ch_locations, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch_locations, CURLOPT_CUSTOMREQUEST, "DELETE");
+            curl_setopt($ch_locations, CURLOPT_HTTPHEADER, [
+                "apikey: $supabase_key",
+                "Authorization: Bearer $supabase_key"
+            ]);
+            $locations_response = curl_exec($ch_locations);
+            $locations_http_code = curl_getinfo($ch_locations, CURLINFO_HTTP_CODE);
+            curl_close($ch_locations);
+            
+            if ($locations_http_code === 204 || $locations_http_code === 200) {
+                $deletion_success[] = "ลบสำเร็จ";
+            } elseif ($locations_http_code !== 404) {
+                $deletion_errors[] = "ลบไม่สำเร็จ";
+            }
+
+            // 6. ลบข้อมูลกล้องในตาราง camera สุดท้าย
+            $url = $supabase_url . "/rest/v1/camera?camera_id=eq." . urlencode($delete_id);
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
@@ -95,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "apikey: $supabase_key",
                 "Authorization: Bearer $supabase_key"
             ]);
-            $response  = curl_exec($ch);
+            $response = curl_exec($ch);
             $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
 
@@ -103,10 +204,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
             if ($http_code === 204) {
-                header('Location: add_camera.php?success=' . urlencode('ลบกล้องสำเร็จ!'));
+                $success_msg = 'ลบกล้องสำเร็จ';
+                header('Location: add_camera.php?success=' . urlencode($success_msg));
                 exit();
             } else {
-                header('Location: add_camera.php?error=' . urlencode('เกิดข้อผิดพลาดในการลบ: ' . ($response ?? 'ไม่ทราบสาเหตุ')));
+                header('Location: add_camera.php?error=' . urlencode('ลบกล้องไม่สำเร็จ'));
                 exit();
             }
         } else {
@@ -527,7 +629,7 @@ $users = getAllUsers($supabase_url, $supabase_key);
         <?php endif; ?>
 
         <div class="form-container">
-            <h2><i class="fas fa-plus-circle"></i> เพิ่มกล้อง</h2>
+            <h2><i class="fas fa-plus-circle"></i> เพิ่มกล้องปกติ</h2>
             <form method="post" autocomplete="off">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
                 <div class="form-group">
@@ -553,31 +655,9 @@ $users = getAllUsers($supabase_url, $supabase_key);
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <button type="submit" class="btn-submit">บันทึก</button>
+                <button type="submit" class="btn-submit">บันทึกกล้องปกติ</button>
             </form>
         </div>
-
-        <div class="form-container">
-            <h2><i class="fas fa-trash-alt"></i> ลบกล้อง</h2>
-            <form method="post" autocomplete="off" onsubmit="return confirm('ยืนยันการลบกล้องนี้?');">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
-                <div class="form-group">
-                    <label for="delete_id">เลือก ID กล้อง:</label>
-                    <select id="delete_id" name="delete_id" required>
-                        <option value="">-- เลือกกล้อง --</option>
-                        <?php foreach ($cameras as $cam): ?>
-                            <option value="<?php echo htmlspecialchars($cam['camera_id'], ENT_QUOTES, 'UTF-8'); ?>">
-                                <?php echo htmlspecialchars($cam['camera_id'] . ' - ' . $cam['camera_name'], ENT_QUOTES, 'UTF-8'); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <button type="submit" name="delete_camera" class="btn-delete">ลบกล้อง</button>
-            </form>
-        </div>
-            </div>
-        </div>
-    </div>
 
         <!-- เพิ่มฟอร์มสำหรับกล้อง topview -->
         <div class="form-container">
@@ -626,6 +706,25 @@ $users = getAllUsers($supabase_url, $supabase_key);
             </form>
         </div>
 
+        <div class="form-container">
+            <h2><i class="fas fa-trash-alt"></i> ลบกล้อง</h2>
+            <form method="post" autocomplete="off" onsubmit="return confirm('ยืนยันการลบกล้องนี้?');">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+                <div class="form-group">
+                    <label for="delete_id">เลือก ID กล้อง:</label>
+                    <select id="delete_id" name="delete_id" required>
+                        <option value="">-- เลือกกล้อง --</option>
+                        <?php foreach ($cameras as $cam): ?>
+                            <option value="<?php echo htmlspecialchars($cam['camera_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php echo htmlspecialchars($cam['camera_id'] . ' - ' . $cam['camera_name'], ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <button type="submit" name="delete_camera" class="btn-delete">ลบกล้อง</button>
+            </form>
+        </div>
+
         <!-- ปุ่มแสดงตารางกล้อง -->
         <div class="form-container">
             <h2><i class="fas fa-table"></i> แสดงข้อมูลกล้องทั้งหมด</h2>
@@ -668,7 +767,7 @@ $users = getAllUsers($supabase_url, $supabase_key);
                                 <td class="location">
                                     <div class="location-info">
                                         <i class="fas fa-map-marker-alt location-icon"></i>
-                                        <span><?php echo htmlspecialchars($camera['location'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                        <span><?php echo htmlspecialchars($camera['position'], ENT_QUOTES, 'UTF-8'); ?></span>
                                     </div>
                                 </td>
                                 <td class="created-by">

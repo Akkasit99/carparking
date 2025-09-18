@@ -1,4 +1,6 @@
-/* General Styles */
+/* ========================================
+   GENERAL STYLES - ใช้ในทุกไฟล์
+   ======================================== */
 body {
     font-family: 'Sarabun', sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -10,7 +12,9 @@ body {
     overflow-x: hidden;
 }
 
-/* Header */
+/* ========================================
+   HEADER STYLES - ใช้ในทุกไฟล์ยกเว้น index.php
+   ======================================== */
 header {
     background: #fff;
     color: #333;
@@ -51,7 +55,9 @@ header {
     margin-right: 10px;
 }
 
-/* Modern Dashboard Header */
+/* ========================================
+   MODERN DASHBOARD HEADER - ใช้ใน dashboard.php, add_admin.php, add_camera.php, add_location.php, profile.php, entrance.php, exit.php, parking_lot.php
+   ======================================== */
 .dashboard-wrapper {
     min-height: 100vh;
     position: relative;
@@ -212,7 +218,9 @@ header {
     border-color: rgba(220, 53, 69, 0.3);
 }
 
-/* Buttons */
+/* ========================================
+   BUTTONS - ใช้ในทุกไฟล์ที่มีปุ่ม (dashboard.php, add_admin.php, add_camera.php, add_location.php, entrance.php, exit.php, parking_lot.php)
+   ======================================== */
 .btn, .btn-back, .btn-submit, .btn-delete, .profile-btn, .btn-red {
     display: inline-block;
     background: linear-gradient(135deg, #333 0%, #555 100%);
@@ -267,7 +275,9 @@ header {
     transition: all 0.1s ease;
 }
 
-/* Forms */
+/* ========================================
+   FORMS - ใช้ใน add_admin.php, add_camera.php, add_location.php
+   ======================================== */
 .form-container {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
@@ -279,7 +289,9 @@ header {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Login Page */
+/* ========================================
+   LOGIN PAGE - ใช้เฉพาะใน index.php
+   ======================================== */
 .login-wrapper {
     min-height: 100vh;
     display: flex;
@@ -572,7 +584,9 @@ header {
     font-size: 0.9rem;
 }
 
-/* Dashboard */
+/* ========================================
+   DASHBOARD - ใช้เฉพาะใน dashboard.php
+   ======================================== */
 .dashboard-main {
     position: relative;
     z-index: 1;
@@ -730,7 +744,9 @@ header {
     transform: translateX(5px);
 }
 
-/* Legacy Dashboard Styles for Compatibility */
+/* ========================================
+   LEGACY DASHBOARD STYLES - เก่า สำหรับความเข้ากันได้
+   ======================================== */
 .dashboard-container h2 {
     margin-bottom: 2rem;
     font-size: 2rem;
@@ -772,7 +788,9 @@ header {
 }
 
 
-/* Page-specific styles for entrance, exit, and parking_lot */
+/* ========================================
+   PAGE-SPECIFIC STYLES - ใช้ใน entrance.php, exit.php, parking_lot.php
+   ======================================== */
 .page-wrapper {
     min-height: 100vh;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1717,7 +1735,9 @@ header {
     z-index: 1000;
 }
 
-/* Profile Page */
+/* ========================================
+   PROFILE PAGE - ใช้เฉพาะใน profile.php
+   ======================================== */
 .profile-section {
     padding: 40px 20px;
     max-width: 800px;
@@ -1955,7 +1975,9 @@ header {
         font-size: 16px;
     }
 
-/* Success Message Styles */
+/* ========================================
+   SUCCESS MESSAGE STYLES - ใช้ใน add_admin.php, add_camera.php, add_location.php
+   ======================================== */
 .success-message {
     position: fixed;
     top: 50%;
@@ -2090,7 +2112,9 @@ header {
     }
 }
 
-/* Error Message Styles */
+/* ========================================
+   ERROR MESSAGE STYLES - ใช้ใน add_admin.php, add_camera.php, add_location.php, index.php
+   ======================================== */
 .error-message {
     position: fixed;
     top: 50%;
@@ -2156,7 +2180,9 @@ header {
     }
 }
 
-/* Logout Success Animations */
+/* ========================================
+   LOGOUT SUCCESS ANIMATIONS - ใช้ใน index.php
+   ======================================== */
 @keyframes logoutSuccess {
     0% {
         opacity: 0;
@@ -2598,7 +2624,9 @@ h2:hover {
     }
 }
 
-/* Responsive Design */
+/* ========================================
+   RESPONSIVE DESIGN - ใช้ในทุกไฟล์
+   ======================================== */
 @media (max-width: 1200px) {
     .content-container {
         padding: 15px;

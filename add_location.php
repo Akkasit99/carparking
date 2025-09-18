@@ -90,17 +90,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_location'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location'])) {
     $location_id = trim($_POST['location_id'] ?? '');
     if ($location_id !== '') {
-        $url = $supabase_url . "/rest/v1/locations?id=eq." . urlencode($location_id);
-        list($httpDel) = call_supabase('DELETE', $url, $supabase_key, null, 'return=minimal');
-        $success = ($httpDel === 204) ? "ลบสถานที่สำเร็จ!" : "เกิดข้อผิดพลาดในการลบสถานที่ (HTTP {$httpDel})";
+        // ดึงข้อมูลสถานที่ที่จะลบเพื่อหา camera_id และ location_name
+        $url_get = $supabase_url . "/rest/v1/locations?id=eq." . urlencode($location_id) . "&select=camera_id,location_name";
+        list($httpGet, $respGet) = call_supabase('GET', $url_get, $supabase_key, null, null);
         
-        // เพิ่มการรีเฟรชหลังลบำเร็จ
-        if ($httpDel === 204) {
+        $camera_id = null;
+        $location_name = '';
+        if ($httpGet === 200) {
+            $location_data = json_decode($respGet, true);
+            if (!empty($location_data) && isset($location_data[0])) {
+                $camera_id = $location_data[0]['camera_id'] ?? null;
+                $location_name = $location_data[0]['location_name'] ?? '';
+            }
+        }
+
+        $deletion_errors = [];
+        $deletion_success = [];
+
+        // 1. ลบข้อมูลที่เกี่ยวข้องในตาราง parking_slots_status ทั้งหมดที่มี location_id นี้
+        $url_parking = $supabase_url . "/rest/v1/parking_slots_status?location_id=eq." . urlencode($location_id);
+        list($httpParking, $respParking) = call_supabase('DELETE', $url_parking, $supabase_key, null, 'return=minimal');
+        
+        if ($httpParking === 204 || $httpParking === 200) {
+            $deletion_success[] = "ลบข้อมูลช่องจอดที่เกี่ยวข้อง";
+        } elseif ($httpParking !== 404) { // 404 หมายความว่าไม่มีข้อมูลให้ลบ ซึ่งไม่ใช่ error
+            $deletion_errors[] = "ไม่สามารถลบข้อมูลช่องจอด (HTTP {$httpParking})";
+        }
+
+        // 2. ลบข้อมูลที่เกี่ยวข้องในตาราง entrance, exit, parking_lot ที่มี camera_id เดียวกัน
+        if ($camera_id) {
+            // ลบข้อมูลใน entrance
+            $url_entrance = $supabase_url . "/rest/v1/entrance?camera_id=eq." . urlencode($camera_id);
+            list($httpEntrance, $respEntrance) = call_supabase('DELETE', $url_entrance, $supabase_key, null, 'return=minimal');
+            if ($httpEntrance === 204 || $httpEntrance === 200) {
+                $deletion_success[] = "ลบข้อมูลทางเข้า";
+            } elseif ($httpEntrance !== 404) {
+                $deletion_errors[] = "ไม่สามารถลบข้อมูลทางเข้า (HTTP {$httpEntrance})";
+            }
+
+            // ลบข้อมูลใน parking_exit
+            $url_exit = $supabase_url . "/rest/v1/parking_exit?camera_id=eq." . urlencode($camera_id);
+            list($httpExit, $respExit) = call_supabase('DELETE', $url_exit, $supabase_key, null, 'return=minimal');
+            if ($httpExit === 204 || $httpExit === 200) {
+                $deletion_success[] = "ลบข้อมูลทางออก";
+            } elseif ($httpExit !== 404) {
+                $deletion_errors[] = "ไม่สามารถลบข้อมูลทางออก (HTTP {$httpExit})";
+            }
+
+            // ลบข้อมูลใน parking_lot
+            $url_parking_lot = $supabase_url . "/rest/v1/parking_lot?camera_id=eq." . urlencode($camera_id);
+            list($httpParkingLot, $respParkingLot) = call_supabase('DELETE', $url_parking_lot, $supabase_key, null, 'return=minimal');
+            if ($httpParkingLot === 204 || $httpParkingLot === 200) {
+                $deletion_success[] = "ลบข้อมูลลานจอด";
+            } elseif ($httpParkingLot !== 404) {
+                $deletion_errors[] = "ไม่สามารถลบข้อมูลลานจอด (HTTP {$httpParkingLot})";
+            }
+        }
+
+        // 2.5. ลบ camera_id reference จาก locations ก่อน (เพื่อแก้ไข circular reference)
+        $url_update_location = $supabase_url . "/rest/v1/locations?id=eq." . urlencode($location_id);
+        $update_data = json_encode(['camera_id' => null]);
+        list($httpUpdate, $respUpdate) = call_supabase('PATCH', $url_update_location, $supabase_key, $update_data);
+        if ($httpUpdate === 204 || $httpUpdate === 200) {
+            $deletion_success[] = "ลบการอ้างอิงกล้องจากสถานที่";
+        } elseif ($httpUpdate !== 404) {
+            $deletion_errors[] = "ไม่สามารถลบการอ้างอิงกล้อง (HTTP {$httpUpdate})";
+        }
+
+        // 2.6. ตอนนี้ลบข้อมูลใน camera ได้แล้ว
+        if ($camera_id) {
+            $url_camera = $supabase_url . "/rest/v1/camera?location_id=eq." . urlencode($location_id);
+            list($httpCamera, $respCamera) = call_supabase('DELETE', $url_camera, $supabase_key, null, 'return=minimal');
+            if ($httpCamera === 204 || $httpCamera === 200) {
+                $deletion_success[] = "ลบข้อมูลกล้อง";
+            } elseif ($httpCamera !== 404) {
+                $deletion_errors[] = "ไม่สามารถลบข้อมูลกล้อง (HTTP {$httpCamera})";
+            }
+        }
+        
+        // 3. ลบข้อมูลสถานที่สุดท้าย
+        $url = $supabase_url . "/rest/v1/locations?id=eq." . urlencode($location_id);
+        list($httpDel, $respDel) = call_supabase('DELETE', $url, $supabase_key, null, 'return=minimal');
+        
+        if ($httpDel === 204 || $httpDel === 200) {
+            $success_msg = "ลบสถานที่ '{$location_name}' สำเร็จ!";
+            if (!empty($deletion_success)) {
+                $success_msg .= " (" . implode(", ", $deletion_success) . ")";
+            }
+            $success = $success_msg;
+            
+            // เพิ่มการรีเฟรชหลังลบสำเร็จ
             echo "<script>
                 setTimeout(function() {
                     window.location.href = window.location.pathname;
                 }, 1500);
             </script>";
+        } else {
+            // ถ้าลบสถานที่ไม่สำเร็จ แสดงข้อผิดพลาดทั้งหมด
+            $error_msg = "ไม่สามารถลบสถานที่ '{$location_name}' ได้ (HTTP {$httpDel})";
+            if (!empty($deletion_errors)) {
+                $error_msg .= " - " . implode(", ", $deletion_errors);
+            }
+            // เพิ่มข้อมูล debug เพื่อดูรายละเอียดข้อผิดพลาด
+            $error_msg .= " | Response: " . substr($respDel, 0, 200);
+            $error = $error_msg;
         }
     } else {
         $error = "กรุณาเลือกสถานที่ที่จะลบ";
