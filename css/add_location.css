@@ -1,5 +1,5 @@
 /* ========================================
-   ADD_LOCATION.CSS - สำหรับหน้า add_location.php
+   ADD_CAMERA.CSS - สำหรับหน้า add_camera.php
    ======================================== */
 
 /* GENERAL STYLES */
@@ -172,15 +172,27 @@ header .header-container {
     box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
 }
 
+/* BUTTON DANGER STYLES */
+.btn-delete {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+}
+
+.btn-delete:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+}
+
 .btn-danger {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
 }
 
 .btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
 }
 
 .btn-warning {
@@ -259,58 +271,157 @@ header .header-container {
 }
 
 .form-group input,
-.form-group select,
-.form-group textarea {
+.form-group select {
     width: 100%;
     padding: 12px 16px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 10px;
     font-size: 14px;
+    height: 48px;
     box-sizing: border-box;
+    backdrop-filter: blur(5px);
     transition: all 0.3s ease;
 }
 
-/* === แก้ dropdown ให้ชัดเจน === */
+/* --- แก้ dropdown ให้อ่านง่าย --- */
 .form-group select {
-    height: 48px;
     cursor: pointer;
     appearance: none;
-    background: rgba(255,255,255,0.1);          /* เดิมโปร่ง → ขาว */
-    color: #ffffff;               /* เดิม white → เข้ม */
+    background: rgba(255,255,255,0.1);          /* เดิมโปร่ง → แก้เป็นขาว */
+    color: #ffffff;               /* เดิมขาว → แก้เป็นเข้ม */
     background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23495057" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
     background-repeat: no-repeat;
     background-position: right 15px center;
     background-size: 12px;
 }
 
-.form-group textarea {
-    min-height: 100px;
-    resize: vertical;
-    font-family: inherit;
-}
-
-.form-group input,
-.form-group textarea {
+.form-group input {
     background: rgba(255, 255, 255, 0.1);
     color: white;
 }
 
-.form-group input::placeholder,
-.form-group textarea::placeholder {
+.form-group input::placeholder {
     color: rgba(255, 255, 255, 0.6);
 }
 
 .form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.form-group select:focus {
     outline: none;
     border-color: rgba(102, 126, 234, 0.6);
-    background: #ffffff;    /* ใช้ขาวตอนโฟกัส */
-    color: #212529;         /* ตัวอักษรเข้ม */
+    background: #ffffff;          /* คงพื้นหลังขาวตอนโฟกัส */
+    color: #212529;               /* คงสีตัวอักษรเข้ม */
+}
+
+/* ADD CAMERA SPECIFIC STYLES */
+.add-camera-container {
+    padding: 40px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.add-camera-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.add-camera-header h2 {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.add-camera-header p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.add-camera-form {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.add-camera-form .form-group label {
+    color: #333;
+    text-shadow: none;
+}
+
+.add-camera-form .form-group input,
+.add-camera-form .form-group select {
+    background: #f8f9fa;
+    color: #212529;
+    border: 2px solid #dee2e6;
+    font-weight: 500;
+}
+
+.add-camera-form .form-group input:focus,
+.add-camera-form .form-group select:focus {
+    border-color: #0d6efd;
+    background: #ffffff;
+    color: #212529;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    outline: none;
+}
+
+.add-camera-form .form-group input::placeholder {
+    color: #6c757d;
+    font-weight: 400;
+}
+
+.add-camera-form .form-group select {
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23495057" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+/* CAMERA PREVIEW SECTION */
+.camera-preview {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 15px;
+    border: 2px dashed #dee2e6;
+    text-align: center;
+}
+
+.camera-preview h4 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.camera-preview-placeholder {
+    width: 100%;
+    height: 200px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 1.1rem;
+    border: 2px dashed #dee2e6;
+}
+
+.camera-preview-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    display: block;
 }
 
 /* BUTTON STYLES */
-button, .btn-submit {
+button {
     font-family: 'Inter', sans-serif;
     font-weight: 500;
     border: none;
@@ -327,32 +438,9 @@ button, .btn-submit {
     overflow: hidden;
 }
 
-button:hover, .btn-submit:hover {
+button:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
-}
-
-/* DELETE BUTTON STYLES */
-.btn-delete {
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-delete:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
 }
 
 button:active {
@@ -381,25 +469,6 @@ button::before {
 button:hover::before {
     left: 100%;
 }
-
-/* ADD LOCATION SPECIFIC STYLES */
-.add-location-container { padding: 40px 20px; max-width: 600px; margin: 0 auto; }
-.add-location-header { text-align: center; margin-bottom: 40px; }
-.add-location-header h2 { color: white; font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
-.add-location-header p { color: rgba(255, 255, 255, 0.8); font-size: 1.1rem; margin: 0; }
-.add-location-form { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 20px; padding: 40px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
-.add-location-form .form-group label { color: #333; text-shadow: none; }
-.add-location-form .form-group input,
-.add-location-form .form-group select,
-.add-location-form .form-group textarea { background: #f8f9fa; color: #212529; border: 2px solid #dee2e6; font-weight: 500; }
-.add-location-form .form-group input:focus,
-.add-location-form .form-group select:focus,
-.add-location-form .form-group textarea:focus { border-color: #0d6efd; background: #ffffff; color: #212529; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); outline: none; }
-.add-location-form .form-group input::placeholder,
-.add-location-form .form-group textarea::placeholder { color: #6c757d; font-weight: 400; }
-.add-location-form .form-group select { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23495057" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>'); }
-
-.form-actions { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
 
 /* SUCCESS MESSAGE STYLES */
 .success-message {
@@ -538,38 +607,7 @@ button:hover::before {
     100% { transform: scale(1); opacity: 1; }
 }
 
-/* RESPONSIVE DESIGN */
-@media (max-width: 768px) {
-    header { padding: 1rem; }
-    header .header-container { flex-direction: column; gap: 15px; align-items: flex-start; }
-    .header-brand { gap: 10px; }
-    .brand-logo { width: 40px; height: 40px; }
-    .brand-logo i { font-size: 1.2rem; }
-    .brand-text h1 { font-size: 1.3rem; }
-    .brand-text span { font-size: 0.8rem; }
-    .header-nav { width: 100%; justify-content: space-between; }
-    .nav-btn { padding: 8px 12px; font-size: 0.9rem; }
-    .add-location-container { padding: 20px 15px; }
-    .add-location-header h2 { font-size: 2rem; }
-    .add-location-form { padding: 25px; }
-    .form-actions { flex-direction: column; }
-    .form-actions .btn { width: 100%; }
-    .success-message, .error-message { padding: 20px 30px; font-size: 18px; min-width: 250px; }
-    .success-message::before, .error-message::before { font-size: 24px; width: 40px; height: 40px; line-height: 40px; margin-right: 10px; }
-}
-
-@media (max-width: 480px) {
-    .header-nav { flex-direction: column; gap: 10px; }
-    .nav-btn { width: 100%; justify-content: center; }
-    .add-location-container { padding: 15px 10px; }
-    .add-location-header h2 { font-size: 1.8rem; }
-    .add-location-header p { font-size: 1rem; }
-    .add-location-form { padding: 20px; }
-    .success-message, .error-message { padding: 20px 30px; font-size: 18px; min-width: 250px; }
-    .success-message::before, .error-message::before { font-size: 24px; width: 40px; height: 40px; line-height: 40px; margin-right: 10px; }
-}
-
-/* ตาราง - Enhanced Design */
+/* ตาราง - Enhanced Design for Camera Table */
 .table-main-container {
     margin-top: 30px;
     width: 100%;
@@ -597,7 +635,7 @@ button:hover::before {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #dc3545 0%, #e74c3c 25%, #f39c12 50%, #28a745 75%, #007bff 100%);
+    background: linear-gradient(90deg, #007bff 0%, #28a745 25%, #ffc107 50%, #dc3545 75%, #6f42c1 100%);
     border-radius: 20px 20px 0 0;
 }
 
@@ -609,7 +647,7 @@ button:hover::before {
     padding-bottom: 20px;
     border-bottom: 3px solid transparent;
     background: linear-gradient(white, white) padding-box,
-                linear-gradient(90deg, #dc3545, #28a745, #007bff) border-box;
+                linear-gradient(90deg, #007bff, #28a745, #dc3545) border-box;
     position: relative;
 }
 
@@ -620,7 +658,7 @@ button:hover::before {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #dc3545 0%, #28a745 50%, #007bff 100%);
+    background: linear-gradient(90deg, #007bff 0%, #28a745 50%, #dc3545 100%);
     border-radius: 2px;
 }
 
@@ -636,19 +674,19 @@ button:hover::before {
 }
 
 .table-header h3 i {
-    color: #dc3545;
+    color: #007bff;
     font-size: 1.4rem;
-    text-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+    text-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
 }
 
 .table-count {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
     color: white;
     padding: 12px 20px;
     border-radius: 25px;
     font-size: 0.95rem;
     font-weight: 600;
-    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;
@@ -656,7 +694,7 @@ button:hover::before {
 }
 
 .table-count::before {
-    content: '\f0ca';
+    content: '\f03d';
     font-family: 'Font Awesome 6 Free';
     font-weight: 900;
     font-size: 1rem;
@@ -692,7 +730,7 @@ button:hover::before {
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, #dc3545, #28a745, #007bff);
+    background: linear-gradient(90deg, #007bff, #28a745, #dc3545);
 }
 
 .camera-table th {
@@ -715,11 +753,19 @@ button:hover::before {
 }
 
 .camera-table th:first-child i {
-    color: #dc3545;
+    color: #007bff;
+}
+
+.camera-table th:nth-child(2) i {
+    color: #28a745;
+}
+
+.camera-table th:nth-child(3) i {
+    color: #ffc107;
 }
 
 .camera-table th:last-child i {
-    color: #28a745;
+    color: #dc3545;
 }
 
 .camera-table td {
@@ -763,22 +809,30 @@ button:hover::before {
     line-height: 1.4;
 }
 
-.location-icon {
-    color: #dc3545;
+.camera-icon {
+    color: #007bff;
     font-size: 1.2rem;
-    text-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+    text-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
     transition: all 0.3s ease;
 }
 
-.camera-icon {
+.location-icon {
     color: #28a745;
     font-size: 1.2rem;
     text-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
     transition: all 0.3s ease;
 }
 
+.user-icon {
+    color: #dc3545;
+    font-size: 1.2rem;
+    text-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+    transition: all 0.3s ease;
+}
+
+.camera-table tr:hover .camera-icon,
 .camera-table tr:hover .location-icon,
-.camera-table tr:hover .camera-icon {
+.camera-table tr:hover .user-icon {
     transform: scale(1.1);
     filter: brightness(1.2);
 }
@@ -824,8 +878,26 @@ button:hover::before {
     }
 }
 
-/* Responsive Design Enhancements */
+/* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
+    header { padding: 1rem; }
+    header .header-container { flex-direction: column; gap: 15px; align-items: flex-start; }
+    .header-brand { gap: 10px; }
+    .brand-logo { width: 40px; height: 40px; }
+    .brand-logo i { font-size: 1.2rem; }
+    .brand-text h1 { font-size: 1.3rem; }
+    .brand-text span { font-size: 0.8rem; }
+    .header-nav { width: 100%; justify-content: space-between; }
+    .nav-btn { padding: 8px 12px; font-size: 0.9rem; }
+    .add-camera-container { padding: 20px 15px; }
+    .add-camera-header h2 { font-size: 2rem; }
+    .add-camera-form { padding: 25px; }
+    .form-actions { flex-direction: column; }
+    .form-actions .btn { width: 100%; }
+    .camera-preview-placeholder { height: 150px; font-size: 1rem; }
+    .camera-preview-placeholder i { font-size: 2rem; }
+    
+    /* Table Responsive Styles */
     .table-container-wide {
         padding: 20px;
         margin: 15px;
@@ -852,13 +924,26 @@ button:hover::before {
         gap: 8px;
     }
     
+    .camera-icon,
     .location-icon,
-    .camera-icon {
+    .user-icon {
         font-size: 1rem;
     }
 }
 
 @media (max-width: 480px) {
+    .header-nav { flex-direction: column; gap: 10px; }
+    .nav-btn { width: 100%; justify-content: center; }
+    .add-camera-container { padding: 15px 10px; }
+    .add-camera-header h2 { font-size: 1.8rem; }
+    .add-camera-header p { font-size: 1rem; }
+    .add-camera-form { padding: 20px; }
+    .success-message, .error-message { padding: 20px 30px; font-size: 18px; min-width: 250px; }
+    .success-message::before, .error-message::before { font-size: 24px; width: 40px; height: 40px; line-height: 40px; margin-right: 10px; }
+    .camera-preview-placeholder { height: 120px; font-size: 0.9rem; }
+    .camera-preview-placeholder i { font-size: 1.5rem; }
+    
+    /* Table Mobile Responsive Styles */
     .table-container-wide {
         padding: 15px;
         margin: 10px;
