@@ -1,0 +1,535 @@
+/* ========================================
+   DASHBOARD.CSS - สำหรับหน้า dashboard.php
+   ======================================== */
+
+/* GENERAL STYLES */
+body {
+    font-family: 'Sarabun', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* BUTTON STYLES */
+button {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+}
+
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+button:hover::before {
+    left: 100%;
+}
+
+/* DASHBOARD WRAPPER */
+.dashboard-wrapper {
+    min-height: 100vh;
+    position: relative;
+}
+
+.dashboard-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* MODERN HEADER */
+.modern-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.modern-header .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.brand-logo {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.brand-logo i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.brand-text h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Fallback for brand text */
+@supports not (-webkit-background-clip: text) {
+    .brand-text h1 {
+        color: #667eea;
+        background: none;
+    }
+}
+
+.brand-text span {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 400;
+}
+
+.header-nav {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-left: auto;
+}
+
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.nav-btn.profile-btn {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.nav-btn.profile-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.nav-btn.logout-btn {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.nav-btn.logout-btn:hover {
+    background: rgba(220, 53, 69, 0.2);
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+/* DASHBOARD MAIN CONTENT */
+.dashboard-main {
+    position: relative;
+    z-index: 1;
+    min-height: calc(100vh - 80px);
+}
+
+.dashboard-container {
+    padding: 3rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.dashboard-header h2 {
+    margin-bottom: 0.5rem;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: white;
+}
+
+.dashboard-header p {
+    color: white;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* DASHBOARD GRID */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.dashboard-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 30px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.dashboard-card:hover::before {
+    transform: scaleX(1);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.dashboard-card.entrance .card-icon {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.dashboard-card.exit .card-icon {
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+}
+
+.dashboard-card.parking .card-icon {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+}
+
+.dashboard-card.admin .card-icon {
+    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+}
+
+.dashboard-card.camera .card-icon {
+    background: linear-gradient(135deg, #607D8B, #455A64);
+}
+
+.dashboard-card.location .card-icon {
+    background: linear-gradient(135deg, #F44336, #D32F2F);
+}
+
+.dashboard-card:hover .card-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.card-content {
+    flex: 1;
+}
+
+.card-content h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.card-content p {
+    margin: 0;
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.card-arrow {
+    font-size: 1.2rem;
+    color: #999;
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover .card-arrow {
+    color: #667eea;
+    transform: translateX(5px);
+}
+
+/* LEGACY DASHBOARD STYLES - เก่า สำหรับความเข้ากันได้ */
+.dashboard-container h2 {
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.dashboard-menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.menu-item {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.menu-item i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #1976d2;
+}
+
+.menu-item span {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    /* Dashboard Responsive */
+    .modern-header {
+        padding: 1rem;
+    }
+    
+    .modern-header .header-container {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .header-brand {
+        gap: 10px;
+    }
+    
+    .brand-logo {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .brand-logo i {
+        font-size: 1.2rem;
+    }
+    
+    .brand-text h1 {
+        font-size: 1.3rem;
+    }
+    
+    .brand-text span {
+        font-size: 0.8rem;
+    }
+    
+    .header-nav {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .nav-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .dashboard-container {
+        padding: 2rem 1rem;
+    }
+    
+    .dashboard-header h2 {
+        font-size: 2rem;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .dashboard-card {
+        padding: 25px 20px;
+    }
+    
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.8rem;
+    }
+    
+    .card-content h3 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Dashboard Mobile */
+    .modern-header {
+        padding: 0.8rem;
+    }
+    
+    .header-nav {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .nav-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .dashboard-container {
+        padding: 1.5rem 1rem;
+    }
+    
+    .dashboard-header h2 {
+        font-size: 1.8rem;
+    }
+    
+    .dashboard-header p {
+        font-size: 1rem;
+    }
+    
+    .dashboard-card {
+        padding: 20px 15px;
+        gap: 15px;
+    }
+    
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .card-content h3 {
+        font-size: 1.1rem;
+    }
+    
+    .card-content p {
+        font-size: 0.9rem;
+    }
+}
+
+/* BUTTON DANGER STYLES */
+.btn-delete {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+}
+
+.btn-delete:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+}
